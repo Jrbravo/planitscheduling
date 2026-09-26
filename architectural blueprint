@@ -1,0 +1,149 @@
+Audit complete. I inspected every function in index.html (~1,230 lines), main.pjs, and the boot/persistence paths. No files were modified. Here is the architectural blueprint.
+
+PLAN-IT SCHEDULING — ARCHITECTURE AUDIT (analysis only, no changes made)
+1. APPLICATION STRUCTURE
+Repository contents: exactly two meaningful files. main.pjs (7 lines: kv + superFetch imports, $meta title/description) and index.html (~1,230 lines: ~150 CSS, ~60 HTML body, ~1,000 JS in one classic <script>). No src/ directory exists.
+
+Major systems and where they live (all in index.html unless noted):
+
+System	Location	Entry points
+HTML shell / layout	body: .topbar, nav.sideL, .maincol (5 details.card modules), aside.sidecol, .footerbar	static
+CSS theme	<style> lines ~1–150	—
+Global state	S object, line 240	every function
+Defaults/seed data	defaults() :303	load()
+Persistence	save() :336, load() :337 + migrations :359–373	save() called from ~25 sites; load() once at boot :1227
+Time/shift math	shiftRange() :284, SHIFTTPL :243, S.times overrides, S.hours store hours	coverage, generation, all renders
+Coverage model	roleBodies, budTolOK, leadWindow, managerOnDuty, manualCover, shiftCoverage, shiftShortage, coverageStats (:466–771)	validation, scoring, generation, issues panel, quality modal
+Fatigue engine	fatigueOpt, personShifts, fatigueIssuesFor, fatigueScan (:668–728)	generation trial-filter, validation, issues
+Fairness engine	shiftDesir, fairBal, snapshotFairness, fairTotals, fairnessFlags, xcStats (:690–958)	generation sort, scoring, quality modal, issues
+Generation	buildSchedule + inner pick() (:871–929)	autoGenerate
+Validation	validateSchedule() :985	autoGenerate, scoreSchedule, testLaborBudget
+Scoring	scoreSchedule() :960	autoGenerate, qualityModal
+Commit/rollback	autoGenerate :1029, undoGenerate :1039, lastGenBackup :1028	Auto-generate button, Undo button
+UI rendering	renderAll :384 fans out to renderHours/Hours, renderManagers, renderNeeds, renderStaff, renderGrid→renderMatrix, renderEvents, renderIssues, renderLegend, renderLocBadge	every mutation
+Interaction	openPicker :785, openManual :851, drag-drop (dropOnChip, moveShiftTo, schedTable.ondragover/ondrop), setSlot, setCustom, saveMgrDay	clicks/drag
+Settings	openSettings :820, saveSettings :849, US_CITIES, fatigue opts, crossCover	Settings button
+Labor budget	totalLabor :465, laborBudget input (Manager module), checks in renderIssues :776 + validateSchedule :994	Manager module, validation
+Events	addEvent/delEvent/cycleEvent/renderEvents (:591–607), S.events	side panel, PDF export
+News ticker	NEWS_FEEDS, refreshNews, renderNews, newsMove, startNewsTimer, loadNewsCache (:1169–1226), root.superFetch	boot, 60 s timer
+PDF export	ensurePDFLibs, exportPDF (:1068–1131), cdnjs jsPDF + autotable	Export button
+Regression test	testLaborBudget() :1005	manual via console/eval
+Boot	load().then(()=>{renderAll();goModule(2,false);refreshNews()}) :1227	page load
+Dependencies (direction): UI events → mutate S → save() + render*. Generation reads config + coverage + fatigue + fairness-history, writes S.assign, then validation/scoring judge it. Rendering reads everything but writes nothing except UI-local state (hoursOpen, newsIdx, modal contents). News and PDF are leaves (read state, no coupling back). Persistence is called directly by UI handlers — there is no store layer.
+
+2. SCHEDULING ENGINE (what the code ACTUALLY does)
+Pipeline: defaults() config → shiftRange() resolves each shift-row's wall-clock window → buildSchedule() fills S.assign row by row → validateSchedule() hard-gates each of 50 candidates → scoreSchedule() ranks survivors → best-of-50 → improve-only commit → snapshotFairness() → qualityModal(); failure → restore backup → rejectionNotice().
+
+Shift templates. Six fixed rows (no UI to add/remove shifts): AM-FT, MID-FT, PM-FT, AM-PT, MID-PT, PM-PT, each {tkey, kind, emp, need:{role:count}}. Current needs: AM-FT 1 Lead+2 Bud, MID-FT 1 Bud, PM-FT 1 Lead+2 Bud, AM-PT 1 Bud, MID-PT 0, PM-PT 1 Bud = 7 Budtender slots/day = 49/week. shiftRange() priority: (1) S.times[day__shiftId] custom override, (2) SHIFTTPL[tkey] with Fri/Sat (day===4||5) weekend times, (3) fallback deriving from store open/close using FT_MIN=510/PT_MIN=390 (only reachable for non-template keys, which cannot currently be created). Closed day → null → row skipped in generation, and staffing a closed day is a violation.
+Role eligibility. Exact match only: pick() requires s.role===role. Leads can only ever fill Lead-need slots, Budtenders only Budtender-need slots. All Managers are manual:true (enforced by v5 migration), and pick() excludes s.manual — so Managers are never auto-scheduled, ever. Manager presence comes only from hand-entered S.manual times or manual slot assignment.
+FT/PT behavior. Coverage is role-based: roleBodies() counts bodies by role only; any FT/PT mix satisfies a headcount. FT/PT matters in exactly three places: (a) paidHours() charges the shift row's designation (FT_PAID=8, PT_PAID=6.5), not the worker's — a PT worker on an FT row costs 8 h against their cap; (b) sort preference in pick() (same-emp first, skipped when crossCover==="always"); (c) hard emp gate only when crossCover==="never".
+Cross-cover. S.opt.crossCover: "never" = hard same-emp filter in pick(); "necessary" (default) = same-emp sorted first, cross-emp allowed (including fatigue fall-through); "always" = no emp preference. PT-designated rows are filled first (shOrder sorts PT rows first), so PT staff naturally claim PT-intended work before FT backfill.
+Availability / days off. pick() excludes s.off days. Validation flags any assignment or manual time on an off day as a violation. Generation additionally requires fresh = not already working that day (assignedToday, which includes manual times) — one shift per person per day, hard.
+Hour limits. pick() requires h[id]+paid<=s.max+1e-6 where paid is the row's paid value. Validation flags paidHours(s)>s.max. h[] is generation-local; paidHours() recomputes from live S.assign + manual times (manual: actual minutes minus 30-min lunch iff shift ≥8 h, rounded to half hours).
+Rest/fatigue. fatigueOpt() defaults: min rest 11 h, close-to-open banned, max 5 consecutive days, max 3 consecutive nights, min 1 day off/week (all tunable in Settings; missing keys fall back to these defaults). personShifts() merges slot assignments (with that row's resolved times) and manual times (kind inferred from clock: start<12:00→AM, end≥20:00→PM, else MID), sorted chronologically. Generation trial-assigns then rejects the candidate person if fatigueIssuesFor().length>0 (push/pop probe). Validation reports every issue per person.
+Manager coverage. managerOnDuty() = manual Managers whose time overlaps the row's window and who aren't off that day. A need.Manager>0 row fails with no manager on duty. (All default rows have need.Manager=0; v5 migration zeroes any legacy Manager needs.)
+Lead coverage. leadWindow() builds coverage segments over the row's window from assigned Leads (full-row segments), manual Leads/Managers (clipped segments), and slot-assigned Managers (full-row). Any uncovered gap → Lead coverage gap … (no Lead or Manager present). This is continuous-coverage, not headcount.
+Opening/closing substitution. budTolOK() (requires S.opt.mgrCovers, AM/PM rows only): AM = some manager overlapping with start before 9:00; PM = some manager covering past the row's midpoint. When true, generation decrements that row's Budtender want by 1 and shiftCoverage() forgives one miss (budSub=true), so both sides agree.
+Manual/sacred assignments. S.manual[day__staffId]={s,e}. Skipped by the generator, counted by manualCover/roleBodies/managerOnDuty/leadWindow (overlap-clipped), still subject to day-off/fatigue/double-book validation. Generation also subtracts manualCover overlap from each row's wants before filling.
+Labor budget. S.opt.laborBudget; blank/0/invalid = no cap (input handler deletes the key). validateSchedule() and renderIssues() flag Schedule requires X hours, but weekly labor budget is Y hours (over hour cap) when totalLabor()>B. The (over hour cap) suffix routes it into scoring's hours bucket (×10000). Rejection modal hoists budget lines to the top. It never steers construction — pure candidate filter.
+Fairness scoring. shiftDesir: AM +1, PM −1, Sat −1, Sun −1.5. fairBal = lifetime + current desirability average, used as a sort key (direction flips by row desirability). scoreSchedule soft terms: hour-utilization stdev ×120, night-range ×60, morning/evening ×25, weekend ×40, consecutive-same-kind pattern ×12, cross-week history deviation ×5, shift-pref mismatch ×6, cross-cover χ² ×12, noise ×0.5. Hard terms (×10000): gaps, leadgap, fatigue, off, hours, overlap. Collected but weightless: sub/amGaps/amSubs/pmGaps/pmSubs/mgr (displayed in Quality modal, zero influence on selection).
+Historical fairness. snapshotFairness() writes per-staff {pts,n,AM,MID,PM,WE,xc} under S.fairHist[weekStart] on every apply and every undo. fairTotals() merges all weeks (skipping deleted staff) plus live current-week data if unsnapshotted. xcStats() blends current-week FT→PT fills with historical xc averages into a χ² concentration metric.
+Improve-only. best.score < cur (current schedule's score) → apply; else restore backup and show "Current schedule kept." Ties keep the old schedule.
+Undo. lastGenBackup (assign+manual JSON, set at each generate) → restore + re-snapshot + renderAll. Single depth; overwritten on every generate.
+3. SHARED LOGIC — duplication and disagreement risks
+Single-source-of-truth wins first: shiftRange(), roleBodies(), budTolOK(), leadWindow(), personShifts(), fatigueIssuesFor(), paidHours() are each defined once and shared by coverage/validation/scoring/generation. Real divergences found:
+
+Cross-cover counted three ways. xcStats() current-week = FT staff on PT rows only. renderIssues() mix line = same (FT→PT). But snapshotFairness() writes xc++ for any s.emp!==sh.emp (both directions, including PT→FT). Historical xc therefore mixes bidirectional counts into a metric whose current-week half is unidirectional — the χ² blends inconsistent definitions.
+Two violation classifiers. scoreSchedule() classifies by substring ("hour cap", "day off", "double-booked", "Short:", "Lead coverage gap", …else fatigue); renderIssues() uses independent filter logic. A future message rewording can silently move a violation between buckets (e.g. dropping "(over hour cap)" would demote the budget from ×10000 to a fatigue-weight slap). The labor-budget string and the rejection-hoist filter ("weekly labor budget") are coupled by invisible convention.
+paidHours charges row designation, not worker type — consistent everywhere it is used, but it is a semantic trap for any future module that assumes personal hours.
+counts() is computed but unused in renderIssues and openPicker (dead variable, suggests a removed per-person display).
+Dead render paths: renderDayGrid() and renderPerson() have no callers; renderGrid() unconditionally renders matrix view (S.opt.view is written but never read). shiftColor2/SHIFTC appear unused (matrix uses KINDGRAD).
+4. STATE AND DATA
+Field	Represents	Created	Modified	Persisted	Dependents
+S.v	schema version (5)	literal :240	migrations :359–373	yes	load()
+S.staff[]	{id,name,role,emp,max,off[],manual?,pref?}	defaults() seed (13) / addStaff	Staff panel, mgrMax, delStaff	yes	everything
+S.shifts[6]	{id,tkey,kind,emp,need{}}	defaults() only	needs editor (renderNeeds)	yes	generation, coverage, renders
+S.roles[]	role names	defaults / addRole	add/del role	yes	colors, needs columns, picker
+S.hours[7]	{open,close,closed} per weekday	defaults	Hours panel, copy-mon	yes	shiftRange
+S.times{}	day__shiftId → {s,e} custom overrides	setCustom, copy-times	per-day editor, Auto reset	yes	shiftRange (top priority)
+S.manual{}	day__staffId → {s,e} sacred times	manager panel, openManual, saveMgrDay	same + undo/restore	yes	coverage, fatigue, hours; generator skips
+S.assign{}	day__shiftId → [staffIds] live week	buildSchedule, setSlot, picker, drag-drop	cleared on week change; replaced on apply/undo	yes	renders, validation, scoring
+S.weekStart	Monday ISO of viewed week	defaults/load	week nav, date input	yes	weekDays(), fairHist key
+S.opt{}	all settings incl. laborBudget, fatigue knobs, crossCover, mgrCovers, floatPT/N, state/city, view	defaults + settings UI + feature inputs	same	yes	generation, validation, scoring
+S.events[]	{id,day,text,st}	addEvent	status cycle, delete	yes	side panel, PDF
+S.fairHist{}	week → staffId → {pts,n,AM,MID,PM,WE,xc}	snapshotFairness	apply + undo	yes	fairBal, xcStats, score hist
+lastGenBackup	pre-generate assign+manual JSON	autoGenerate	each generate	no (memory only; lost on refresh)	undoGenerate
+hoursOpen, newsArts/Idx/Timer, tipEl	UI-local state	runtime	runtime	no	renders only
+Note: S.assign holds only the viewed week — changing weeks wipes it (only fairHist remembers the past). delStaff orphans that id in S.manual/S.fairHist (readers guard, writers don't clean).
+
+5. PERSISTENCE
+Two stores, no transaction. save() fire-and-forget writes localStorage["sched-v1"] (sync) and root.kv.schedule/"v1" (async, unawaited, no debounce — called on every keystroke from staff inputs). Concurrent in-flight kv writes can resolve out of order (last-resolution-wins, not last-call-wins).
+Load precedence: kv first, else localStorage. Two sources of truth that can silently diverge (e.g. kv write fails but localStorage succeeds → next load resurrects the kv copy, discarding newer localStorage state).
+Legacy migration (load()): pre-tkey schemas are downcast (Worker→Lead/Budtender, max*=8, everything non-Manager forced FT) with version stepping v2→v5. Current v5 forces all Managers manual and zeroes Manager needs.
+Missing data: absent fields are backfilled (times/manual/events/opt guards + defaults()), so fresh boot is safe.
+Malformed data: JSON.parse(raw) for localStorage sits outside any try/catch — corrupt localStorage throws, load() rejects, the boot .then() never runs, and the app renders nothing. kv path is guarded; localStorage path is not.
+News cache: separate localStorage["planit-news-v2"] ({day, arts}), day-string expiry, stale-cache fallback. Survives independently of schedule data.
+6. ARCHITECTURAL RISKS (identified, not solved)
+One ~1,230-line file; ~90 globals sharing one mutable S — no ownership boundaries.
+Scheduler, validator, scorer, and renderers all read/write the same live S.assign in place (buildSchedule resets it; pick pushes/pops trial assignments into it) — generation cannot run without clobbering live state; no pure/detached engine.
+Business rules live inside render-adjacent code and DOM handlers (e.g. budget input handler, picker sort); rule text coupled by substring matching (§3.2).
+save()+renderAll() invoked directly from ~25 UI sites — persistence coupled to keystrokes, no batching, no dirty-tracking.
+Week navigation destroys S.assign (single-week memory) — real workforce history beyond fairHist aggregates is impossible.
+Random ids (uid()) with no collision check; staff identity = opaque id, so fair-history continuity breaks silently on delete/re-add.
+S.shifts fixed at six rows with no editor (needs are editable, rows are not) — the 49-slot structure is hardcoded by seed data, not by rule.
+Dead code (renderDayGrid, renderPerson, counts() uses, S.opt.view) will mislead future refactors about supported views.
+Test surface is one function (testLaborBudget, 5 asserts); the "8/8 validation scenarios" from project history exist only as tribal knowledge — not in the repo.
+External CDN dependency at export time (cdnjs jsPDF) with no vendoring/fallback; news depends on live RSS via plugin proxy.
+7. PROPOSED FUTURE STRUCTURE (fitted to this code, not generic)
+src/
+  config.js       # DAYS, SHIFTTPL, FT/PT_MIN/PAID, seed roster, default needs/hours, US_CITIES, NEWS_FEEDS
+  time.js         # fmt/tstr/toMin/iso/monday/weekDays/key, shiftRange + overrides
+  store.js        # S shape, defaults(), get/set, subscribe; single mutation funnel
+  persistence.js  # save/load, kv+localStorage, migrations v2..v5, malformed-data guards
+  coverage.js     # roleBodies, manualCover, managerOnDuty, budTolOK, leadWindow, shiftCoverage, coverageStats
+  fatigue.js      # fatigueOpt, personShifts, fatigueIssuesFor
+  fairness.js     # shiftDesir, fairBal, snapshotFairness, fairTotals, fairnessFlags, xcStats  (+unify xc definition)
+  hours.js        # paidHours, totalLabor, counts
+  engine.js       # buildSchedule/pick (pure: config+staff → assignments, no live S writes)
+  validate.js     # validateSchedule + stable violation codes (replace substring classification)
+  score.js        # scoreSchedule weights table
+  orchestrate.js  # autoGenerate loop, improve-only commit, backup/undo, rejection reporting
+  ui/  grid.js panels.js modals.js picker.js dnd.js tips.js boot.js
+  services/news.js services/export.js
+  tests/regression.js  # recovered scenarios + labor-budget asserts, runnable headless
+Rationale: coverage.js/fatigue.js/hours.js already exist as implicit clusters of shared pure-ish functions — extract them first. validate.js must introduce stable violation codes to break the substring coupling before anything else references messages. engine.js must become pure (the single biggest enabler: testable generation without live-state clobber).
+
+8. MIGRATION PLAN (behavior-preserving, independently testable phases)
+Phase 0 — Baseline lock (no refactor). Recover the 8 historical validation scenarios into tests/regression.js as data + expected violations; record current outputs (49-slot needs, 371 h demand, seed roster) as golden fixtures. Gate: all pass pre- and post-every phase.
+Phase 1 — Pure-function extraction. Move time utils + shiftRange, paidHours/totalLabor, fatigue trio into modules with zero logic change; dual-run (old vs new, deep-compare) behind a flag. Gate: identical outputs on fixtures + live week.
+Phase 2 — Violation codes. Give every validation message a stable code; scorer and rejection-hoist switch to codes, strings stay identical. Gate: scores and modals byte-identical.
+Phase 3 — Store + persistence. Funnel mutations through store.js; add debounced single-writer persistence, malformed-data guard, kv/local divergence resolution. Gate: refresh/legacy-data upgrade tests; saved data format unchanged.
+Phase 4 — Pure engine. buildSchedule operates on injected state, returns assignments; orchestrator commits. Fix the live-clobber pattern. Gate: 50-seed deterministic comparison old-vs-new generator.
+Phase 5 — UI split. Move render/interaction files out one panel at a time; engine imports frozen. Gate: visual + interaction checklist per panel.
+Phase 6 — xc unification. Resolve §3.1 with an explicit product decision (directional vs bidirectional) — deliberately last, as it's the only behavior-adjacent change.
+9. TEST/REGRESSION BASELINE (must stay green every phase)
+Seed defaults: 13 staff, 6 shift rows, needs {2,1,2,1,0,1} Budtender = 49 slots; store hours Sun–Thu 9–7, Fri–Sat 9–9.
+Role-based coverage: any FT/PT mix satisfies Budtender headcounts (incl. PT worker on FT-designated row ⇒ no shortage).
+crossCover never/necessary/always pool behavior; PT rows filled first.
+Manager substitution: AM/PM tolerance math (9:00 rule, midpoint rule), budSub agreement between generation and validation.
+Continuous lead-window gaps (not headcount); manager-on-duty rule.
+Day-off, hour-cap (row-designated paid hours: 8/6.5), double-book, closed-day violations.
+Fatigue defaults (11 h rest, no close-to-open, 5-day/3-night/1-off) incl. manual-time kind inference.
+Labor budget: 450 ⇒ no flag; below-demand ⇒ explicit message hoisted first; blank/0 ⇒ no cap; generate preserves prior assignments on failure.
+Improve-only commit, rejection restores backup byte-identical, single-depth undo + re-snapshot.
+Manual/sacred times: skipped by generator, counted by coverage, still validated.
+Fairness history round-trips across weeks; deleted-staff guards; quality-modal fairness/xc display values.
+Persistence: fresh boot seeds; legacy v2 data migrates; refresh preserves week state.
+The 8 historical validation scenarios (to be recovered into the repo in Phase 0).
+No-console-error load; PDF export produces matrix + events; news failure degrades silently.
+10. FINAL OUTPUT MAPS
+A. Architecture map — §1 table: single-file app, S at the center, UI↔state direct coupling, scheduler/validator/scorer sharing live state, news/PDF as leaves, dual persistence behind save()/load().
+B. Engine dependency map — config(SHIFTTPL/S.hours/S.times) → shiftRange → coverage fns → buildSchedule.pick ⇄ fatigue probe → S.assign → validateSchedule → scoreSchedule (re-reads coverage+fatigue+fairness-history) → best-of-50 → commit/undo; fairness-history loop feeds back into next week's pick sort.
+C. Data/state map — §4 table; single-week assign, cross-week memory only via fairHist; lastGenBackup volatile.
+D. Duplicated/conflicting logic — §3: triple xc definition (§3.1), dual violation classifiers (§3.2), row-vs-worker hours trap (§3.3), dead code (§3.4–3.5).
+E. Risks — §6 (10 items).
+F. Module structure — §7 (15 modules in 5 groups).
+G. Migration phases — §8 (0–6, behavior locked first, xc decision last).
+H. Regression checklist — §9 (14 gates).
+
+Ready for your review. When you approve, I suggest starting with Phase 0 (recovering the 8 scenarios as runnable fixtures) since everything else depends on that safety net.
