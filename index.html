@@ -186,7 +186,8 @@ details:not([open]) > :not(summary){display:none}
 </details>
 <details class="card noPrint" open>
 <summary>02 // Manager</summary>
-<div class="row" style="margin:8px 0"><label>Manager <select id="mgrSel"></select></label><span class="muted" id="mgrTot"></span></div>
+<div class="row" style="margin:8px 0"><label>Manager <select id="mgrSel"></select></label><label class="muted">Max hrs/wk <input type="number" id="mgrMax" min="0" max="80" style="width:56px"></label><span class="muted" id="mgrTot"></span></div>
+<div class="row" style="margin:8px 0"><label class="muted">Weekly labor budget (hrs) <input type="number" id="laborBudget" min="0" max="2000" style="width:64px" title="Total scheduled hours allowed for all staff this week — blank = no cap"></label><span class="muted" id="laborTot"></span></div>
 <div id="mgrDays"></div>
 </details>
 <details class="card" open>
@@ -195,7 +196,7 @@ details:not([open]) > :not(summary){display:none}
 <div class="row noPrint" style="margin-top:8px">
 <label class="muted"><input type="checkbox" id="floatChk"> Throw in extra PT helpers</label>
 <label class="muted">up to <input type="number" id="floatN" min="0" max="5" style="width:48px"> per shift, picked at random</label>
-<label class="muted"><input type="checkbox" id="mgrCovChk"> Manager on duty covers 1 open spot</label>
+<label class="muted"><input type="checkbox" id="mgrCovChk"> Allow manager substitution for a missing budtender (open/close)</label>
 </div>
 <div class="muted noPrint" style="margin-top:4px">Tip: click any shift on the schedule to add or remove people.</div>
 <div class="schedWrap"><table class="sched" id="schedTable"></table><div id="personListEl"></div></div>
@@ -239,6 +240,12 @@ details:not([open]) > :not(summary){display:none}
 let S = {v:5,staff:[],shifts:[],roles:[],hours:[],times:{},manual:{},assign:{},weekStart:null};
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const COLORS=["#2563eb","#059669","#d97706","#dc2626","#7c3aed","#0891b2","#db2777","#4d7c0f"];
+const SHIFTTPL={
+"AM-FT":{wd:{s:495,e:990},we:{s:495,e:990}},
+"MID-FT":{wd:{s:540,e:1050},we:{s:750,e:1260}},
+"PM-FT":{wd:{s:690,e:1200},we:{s:810,e:1320}},
+"AM-PT":{wd:{s:495,e:885},we:{s:495,e:885}},
+"PM-PT":{wd:{s:810,e:1200},we:{s:930,e:1320}}};
 const FT_MIN=510, PT_MIN=390, FT_PAID=8, PT_PAID=6.5;
 const SHIFTC={"AM-FT":{bg:"#dbeafe",fg:"#1e40af",label:"AM Full-time"},"MID-FT":{bg:"#dcfce7",fg:"#166534",label:"Mid Full-time"},"PM-FT":{bg:"#ffedd5",fg:"#9a3412",label:"PM Full-time"},"AM-PT":{bg:"#e0e7ff",fg:"#3730a3",label:"AM Part-time"},"MID-PT":{bg:"#fef9c3",fg:"#854d0e",label:"Mid Part-time"},"PM-PT":{bg:"#fce7f3",fg:"#9d174d",label:"PM Part-time"}};
 function shiftColor2(t){return SHIFTC[t]||{bg:"#f3f4f6",fg:"#111827",label:t}}
@@ -279,6 +286,8 @@ function shiftRange(sh,day){
   if(ov)return {s:ov.s,e:ov.e,label:fmt(ov.s)+"–"+fmt(ov.e),custom:true};
   let H=S.hours[day];
   if(!H||H.closed)return null;
+  let T=SHIFTTPL[sh.tkey];
+  if(T){let t=(day===4||day===5)?T.we:T.wd;return{s:t.s,e:t.e,label:fmt(t.s)+"–"+fmt(t.e),custom:false}}
   let o=toMin(H.open),c=toMin(H.close);
   if(c<=o)return null;
   let len=sh.emp==="FT"?FT_MIN:PT_MIN;
@@ -296,15 +305,15 @@ function defaults(){
   if(!S.opt)S.opt={floatPT:false,floatN:1,view:"matrix",mgrCovers:true};
   if(!S.opt.view)S.opt.view="person";
   if(!S.roles||!S.roles.length)S.roles=["Manager","Lead","Budtender"];
-  if(!S.hours||!S.hours.length)S.hours=DAYS.map((_,i)=>({open:"09:00",close:"21:00",closed:i===6?false:false}));
+  if(!S.hours||!S.hours.length)S.hours=DAYS.map((_,i)=>({open:"09:00",close:(i===4||i===5)?"21:00":"19:00",closed:false}));
   if(!S.shifts.length){
     let mk=(tkey,kind,emp,need)=>({id:uid(),tkey,kind,emp,need});
     S.shifts=[
-      mk("AM-FT","AM","FT",{Manager:0,Lead:0,Budtender:1}),
-      mk("MID-FT","MID","FT",{Manager:0,Lead:1,Budtender:0}),
-      mk("PM-FT","PM","FT",{Manager:0,Lead:0,Budtender:1}),
-      mk("AM-PT","AM","PT",{Manager:0,Lead:1,Budtender:0}),
-      mk("MID-PT","MID","PT",{Manager:0,Lead:0,Budtender:1}),
+      mk("AM-FT","AM","FT",{Manager:0,Lead:1,Budtender:2}),
+      mk("MID-FT","MID","FT",{Manager:0,Lead:0,Budtender:1}),
+      mk("PM-FT","PM","FT",{Manager:0,Lead:1,Budtender:2}),
+      mk("AM-PT","AM","PT",{Manager:0,Lead:0,Budtender:1}),
+      mk("MID-PT","MID","PT",{Manager:0,Lead:0,Budtender:0}),
       mk("PM-PT","PM","PT",{Manager:0,Lead:0,Budtender:1})
     ];
   }
@@ -432,6 +441,7 @@ function renderStaff(){
     d.innerHTML=`<input type="text" data-f="name" placeholder="Name" style="width:110px">`+
     `<select data-f="role">${S.roles.map(r=>`<option ${r===st.role?"selected":""}>${r}</option>`).join("")}</select>`+
     `<select data-f="emp"><option ${st.emp==="FT"?"selected":""}>FT</option><option ${st.emp==="PT"?"selected":""}>PT</option></select>`+
+    `<select data-f="pref" title="Preferred shift"><option value="any" ${!st.pref||st.pref==="any"?"selected":""}>Any shift</option><option value="AM" ${st.pref==="AM"?"selected":""}>Mornings</option><option value="MID" ${st.pref==="MID"?"selected":""}>Mids</option><option value="PM" ${st.pref==="PM"?"selected":""}>Nights</option></select>`+
     `<label class="muted" title="Set times by hand — skipped by auto-generate"><input type="checkbox" data-f="man" ${st.manual?"checked":""}> Manual</label>`+
     `<label class="muted">Max hrs/wk <input type="number" min="0" max="80" data-f="max" style="width:56px"></label>`+
     `<span class="dayoff">${DAYS.map((dn,i)=>`<label><input type="checkbox" data-off="${i}" ${st.off.includes(i)?"checked":""}> ${dn}</label>`).join("")}</span>`+
@@ -441,6 +451,7 @@ function renderStaff(){
     d.querySelector('[data-f=name]').oninput=e=>{st.name=e.target.value;save();renderGrid()};
     d.querySelector('[data-f=role]').onchange=e=>{st.role=e.target.value;save();renderGrid();renderIssues()};
     d.querySelector('[data-f=emp]').onchange=e=>{st.emp=e.target.value;save();renderGrid();renderIssues()};
+    d.querySelector('[data-f=pref]').onchange=e=>{st.pref=e.target.value;save();renderIssues()};
     d.querySelector('[data-f=man]').onchange=e=>{st.manual=e.target.checked;if(!st.manual)for(let d=0;d<7;d++)delete S.manual[d+"__"+st.id];save();renderGrid();renderIssues()};
     d.querySelector('[data-f=max]').oninput=e=>{st.max=Math.max(0,parseInt(e.target.value||"0"));save();renderIssues()};
     d.querySelectorAll('[data-off]').forEach(c=>c.onchange=()=>{let i=+c.dataset.off;st.off=c.checked?[...new Set([...st.off,i])]:st.off.filter(x=>x!==i);save();renderIssues()});
@@ -451,6 +462,7 @@ function renderStaff(){
 function counts(){let m={};S.staff.forEach(s=>m[s.id]=0);for(let k in S.assign)S.assign[k].forEach(id=>{if(m[id]!=null)m[id]++});return m}
 function paidHours(st){let h=0;for(let k in S.assign){if(!S.assign[k].includes(st.id))continue;let sh=S.shifts.find(x=>k.endsWith("__"+x.id));if(sh)h+=sh.emp==="FT"?FT_PAID:PT_PAID}for(let d=0;d<7;d++){let m=S.manual[d+"__"+st.id];if(m){let len=m.e-m.s;h+=len/60-(len>=480?0.5:0)}}return Math.round(h*2)/2}
 function assignedToday(day,id){return S.shifts.some(sh=>getSlot(day,sh.id).includes(id))||!!S.manual[day+"__"+id]}
+function totalLabor(){return Math.round(S.staff.reduce((a,s)=>a+paidHours(s),0)*2)/2}
 function manualCover(day,sh,role){
   let r=shiftRange(sh,day);
   if(!r)return [];
@@ -685,8 +697,9 @@ return n?p/n:0;
 function snapshotFairness(){
 if(!S.fairHist)S.fairHist={};
 let w={};
-S.staff.forEach(s=>{w[s.id]={pts:0,n:0,AM:0,MID:0,PM:0,WE:0}});
+S.staff.forEach(s=>{w[s.id]={pts:0,n:0,AM:0,MID:0,PM:0,WE:0,xc:0}});
 S.staff.forEach(s=>{let e=w[s.id];if(!e)return;personShifts(s.id).forEach(x=>{e.n++;e.pts+=shiftDesir({kind:x.kind},x.day);if(x.kind==="AM"||x.kind==="MID"||x.kind==="PM")e[x.kind]++;if(x.day>=5)e.WE++})});
+for(let k in S.assign){let sh=S.shifts.find(x=>k.endsWith("__"+x.id));if(!sh)continue;S.assign[k].forEach(id=>{let s=staffById(id);if(s&&w[id]&&!s.manual&&s.emp!==sh.emp)w[id].xc++})}
 S.fairHist[S.weekStart]=w;
 }
 function fairTotals(){
@@ -698,7 +711,7 @@ if(!H[S.weekStart])S.staff.forEach(s=>{let t=T[s.id];if(!t)return;personShifts(s
 return T;
 }
 function fairnessFlags(){
-let T=fairTotals(),ids=Object.keys(T).filter(id=>T[id].n>0);
+let T=fairTotals(),ids=Object.keys(T).filter(id=>T[id].n>0&&!(staffById(id)||{}).manual);
 if(!ids.length)return [];
 let avg=k=>ids.reduce((a,id)=>a+T[id][k],0)/ids.length;
 let aPM=avg("PM"),aWE=avg("WE"),aAM=avg("AM"),out=[];
@@ -713,29 +726,58 @@ if(t.n>=5&&dom[1]/t.n>=0.75)out.push(`Fairness: ${s.name} is on ${dom[0]==="AM"?
 return out;
 }
 function fatigueScan(){let out=[];S.staff.forEach(s=>fatigueIssuesFor(s.id).forEach(t=>out.push(`Fatigue: ${s.name} — ${t}`)));return out}
+function roleBodies(d,sh,role){
+let n=getSlot(d,sh.id).map(staffById).filter(s=>s&&s.role===role).length;
+return n+manualCover(d,sh,role).length;
+}
+function budTolOK(d,sh){
+if(!(S.opt&&S.opt.mgrCovers))return false;
+if(sh.kind!=="AM"&&sh.kind!=="PM")return false;
+let r=shiftRange(sh,d);if(!r)return false;
+let mgrs=[];
+S.staff.forEach(s=>{if(s.role!=="Manager")return;let m=S.manual[d+"__"+s.id];if(m&&m.e>m.s)mgrs.push(m);if(getSlot(d,sh.id).includes(s.id))mgrs.push({s:r.s,e:r.e})});
+if(sh.kind==="AM")return mgrs.some(m=>m.s<540&&m.s<r.e&&m.e>r.s);
+let mid=(r.s+r.e)/2;return mgrs.some(m=>m.s<r.e&&m.e>mid);
+}
+function leadWindow(d,sh){
+let r=shiftRange(sh,d);if(!r)return{ok:true};
+let segs=[];
+getSlot(d,sh.id).forEach(id=>{let s=staffById(id);if(s&&s.role==="Lead")segs.push({s:r.s,e:r.e})});
+S.staff.forEach(s=>{
+if(s.role!=="Lead"&&s.role!=="Manager")return;
+let m=S.manual[d+"__"+s.id];if(m&&m.e>m.s)segs.push({s:Math.max(m.s,r.s),e:Math.min(m.e,r.e)});
+if(s.role==="Manager"&&getSlot(d,sh.id).includes(s.id))segs.push({s:r.s,e:r.e});
+});
+segs=segs.filter(x=>x.e>x.s).sort((a,b)=>a.s-b.s);
+let cov=r.s;
+for(let x of segs){if(x.s>cov)return{ok:false,gs:cov,ge:Math.min(x.s,r.e)};if(x.e>cov)cov=x.e;if(cov>=r.e)return{ok:true}}
+return cov>=r.e?{ok:true}:{ok:false,gs:cov,ge:r.e};
+}
+function shiftCoverage(d,sh){
+let out={issues:[],budSub:false},r=shiftRange(sh,d);
+if(r===null){if(getSlot(d,sh.id).length)out.issues.push({kind:"bud",text:`${DAYS[d]} ${sh.tkey}: staffed on closed day`});return out}
+let bw=sh.need.Budtender||0;
+if(bw>0){let got=roleBodies(d,sh,"Budtender"),miss=bw-got;if(miss>0&&budTolOK(d,sh)){miss--;out.budSub=true}if(miss>0)out.issues.push({kind:"bud",text:`Short: ${DAYS[d]} ${sh.tkey} Budtender ${got}/${bw}`})}
+if((sh.need.Lead||0)>0){let lc=leadWindow(d,sh);if(!lc.ok)out.issues.push({kind:"lead",text:`Lead coverage gap: ${DAYS[d]} ${sh.tkey} ${fmt(lc.gs)}–${fmt(lc.ge)} (no Lead or Manager present)`})}
+if((sh.need.Manager||0)>0&&!managerOnDuty(d,sh).length)out.issues.push({kind:"lead",text:`No manager: ${DAYS[d]} ${sh.tkey} requires a manager on duty`});
+S.roles.forEach(role=>{if(role==="Budtender"||role==="Lead"||role==="Manager")return;let want=sh.need[role]||0;if(want<=0)return;let got=roleBodies(d,sh,role);if(got<want)out.issues.push({kind:"bud",text:`Short: ${DAYS[d]} ${sh.tkey} ${role} ${got}/${want}`})});
+return out;
+}
+function shiftShortage(d,sh){return shiftCoverage(d,sh).issues.map(x=>x.text)}
+function coverageStats(){
+let st={bud:0,lead:0,subs:0,amGaps:0,amSubs:0,pmGaps:0,pmSubs:0};
+S.shifts.forEach(sh=>{for(let d=0;d<7;d++){let c=shiftCoverage(d,sh);c.issues.forEach(x=>{if(x.kind==="lead")st.lead++;else st.bud++});let g=c.issues.length;if(sh.kind==="AM"){st.amGaps+=g;if(c.budSub)st.amSubs++}if(sh.kind==="PM"){st.pmGaps+=g;if(c.budSub)st.pmSubs++}if(c.budSub)st.subs++}});
+return st;
+}
 function renderIssues(){
   let c=counts();let lines=[];
-  S.shifts.forEach(sh=>{for(let d=0;d<7;d++){
-    if(shiftRange(sh,d)===null){if(getSlot(d,sh.id).length)lines.push(`${DAYS[d]} ${sh.tkey}: assigned on closed day`);continue}
-    let ids=getSlot(d,sh.id);
-    let short=[];
-    S.roles.forEach(r=>{
-      let want=sh.need[r]||0;
-      let got=ids.map(staffById).filter(s=>s&&s.role===r).length;
-      got+=manualCover(d,sh,r).length;
-      if(got<want)short.push({r,got,want,missing:want-got});
-    });
-    if(S.opt.mgrCovers&&managerOnDuty(d,sh).length&&short.length){
-      short.sort((a,b)=>b.missing-a.missing);
-      if(short[0].missing>0)short[0].missing--;
-    }
-    short.filter(x=>x.missing>0).forEach(x=>lines.push(`Short: ${DAYS[d]} ${sh.tkey} ${x.r}: ${x.got}/${x.want} (manager covering 1)`));
-  }});
+  S.shifts.forEach(sh=>{for(let d=0;d<7;d++)shiftShortage(d,sh).forEach(t=>lines.push(t))});
   S.staff.filter(s=>paidHours(s)>s.max+1e-6).forEach(s=>lines.push(`${s.name} over max hours (${paidHours(s)}/${s.max})`));
+  {let B=(S.opt&&S.opt.laborBudget)||0;if(B&&totalLabor()>B+1e-6)lines.push(`Schedule requires ${totalLabor()} hours, but weekly labor budget is ${B} hours (over hour cap)`);}
   S.staff.filter(s=>s.off.some(d=>S.shifts.some(sh=>getSlot(d,sh.id).includes(s.id))||S.manual[d+"__"+s.id])).forEach(s=>lines.push(`${s.name} scheduled on a day off`));
   fatigueScan().forEach(t=>lines.push(t));
   fairnessFlags().forEach(t=>lines.push(t));
-  let mix=[];for(let k in S.assign){let[day,shid]=k.split("__");let sh=S.shifts.find(x=>x.id===shid);if(!sh)continue;S.assign[k].forEach(id=>{let s=staffById(id);if(s&&s.emp!==sh.emp)mix.push(`${s.name} (${s.emp}) on ${DAYS[+day]} ${sh.tkey} (${sh.emp})`)})}
+  let mix=[];for(let k in S.assign){let[day,shid]=k.split("__");let sh=S.shifts.find(x=>x.id===shid);if(!sh)continue;S.assign[k].forEach(id=>{let s=staffById(id);if(s&&s.emp==="FT"&&sh.emp==="PT")mix.push(`${s.name} (FT) on ${DAYS[+day]} ${sh.tkey} (PT-intended)`)})}
   let el=issuesEl;
   if(!lines.length&&!mix.length){el.innerHTML=`<div class="okline">Fully staffed, no conflicts.</div>`;return}
   el.innerHTML=`<div class="warn">${lines.map(x=>"• "+x).join("<br>")}${mix.length?("<br><span class='muted'>FT/PT cross-cover: "+mix.slice(0,6).join("; ")+(mix.length>6?"…":"")+"</span>"):""}</div>`;
@@ -786,6 +828,8 @@ inner.innerHTML='<div class="row" style="justify-content:space-between"><strong>
 +'<div style="margin-top:12px"><strong>Fatigue &amp; recovery</strong></div>'
 +'<div class="row" style="margin-top:6px"><label class="muted">Min rest (hrs)<br><input id="setRest" type="number" min="0" max="24" step="0.5" style="width:80px"></label><label class="muted">Max days in a row<br><input id="setMaxD" type="number" min="1" max="7" style="width:80px"></label><label class="muted">Max nights in a row<br><input id="setMaxN" type="number" min="1" max="7" style="width:80px"></label><label class="muted">Min days off / week<br><input id="setMinOff" type="number" min="0" max="7" style="width:80px"></label></div>'
 +'<label class="muted" style="display:block;margin-top:6px"><input type="checkbox" id="setCloseOpen"> Allow close-to-open (night into next morning)</label>'
++'<div style="margin-top:12px"><strong>Staffing rules</strong></div>'
++'<div style="margin-top:6px"><span class="muted">Cross-cover: staff on shifts designated for the other group (FT↔PT)</span><select id="setCross" style="width:100%;margin-top:4px"><option value="never">Never</option><option value="necessary">When necessary</option><option value="always">Always allowed</option></select></div>'
 +'<div class="row" style="margin-top:12px;justify-content:flex-end"><button class="small" onclick="saveSettings()">Save</button></div>';
 box.appendChild(inner);m.appendChild(box);
 let ss=inner.querySelector("#setState");
@@ -800,8 +844,9 @@ inner.querySelector("#setMaxD").value=F.maxConsec;
 inner.querySelector("#setMaxN").value=F.maxNights;
 inner.querySelector("#setMinOff").value=F.minOff;
 inner.querySelector("#setCloseOpen").checked=F.allowCloseOpen;
+inner.querySelector("#setCross").value=(S.opt&&S.opt.crossCover)||"necessary";
 }
-function saveSettings(){S.opt=S.opt||{};S.opt.state=setState.value;S.opt.city=setCity.value;let r=parseFloat(setRest.value),md=parseInt(setMaxD.value),mn=parseInt(setMaxN.value),mo=parseInt(setMinOff.value);if(isNaN(r))delete S.opt.restHrs;else S.opt.restHrs=r;if(isNaN(md))delete S.opt.maxConsec;else S.opt.maxConsec=md;if(isNaN(mn))delete S.opt.maxNights;else S.opt.maxNights=mn;if(isNaN(mo))delete S.opt.minOff;else S.opt.minOff=mo;S.opt.allowCloseOpen=setCloseOpen.checked;save();renderLocBadge();closeModal()}
+function saveSettings(){S.opt=S.opt||{};S.opt.state=setState.value;S.opt.city=setCity.value;let r=parseFloat(setRest.value),md=parseInt(setMaxD.value),mn=parseInt(setMaxN.value),mo=parseInt(setMinOff.value);if(isNaN(r))delete S.opt.restHrs;else S.opt.restHrs=r;if(isNaN(md))delete S.opt.maxConsec;else S.opt.maxConsec=md;if(isNaN(mn))delete S.opt.maxNights;else S.opt.maxNights=mn;if(isNaN(mo))delete S.opt.minOff;else S.opt.minOff=mo;S.opt.allowCloseOpen=setCloseOpen.checked;S.opt.crossCover=setCross.value;save();renderLocBadge();closeModal()}
 window.closeModal=closeModal;
 function openManual(day,staffId){
   let st=staffById(staffId);if(!st)return;
@@ -823,31 +868,32 @@ function openManual(day,staffId){
   inner.querySelector("#mnClear").onclick=()=>{delete S.manual[k];save();renderGrid();renderIssues();closeModal()};
   box.appendChild(inner);m.appendChild(box);
 }
-function autoGenerate(){
+function buildSchedule(){
   if(!S.staff.length||!S.shifts.length)return;
   S.assign={};let h={};S.staff.forEach(s=>h[s.id]=0);
   S.shifts.forEach(sh=>{for(let d=0;d<7;d++)S.assign[key(d,sh.id)]=[]});
   let pick=(d,sh,role,paid)=>{
     let pool=S.staff.filter(s=>!s.manual&&s.role===role&&h[s.id]+paid<=s.max+1e-6&&!getSlot(d,sh.id).includes(s.id)&&!s.off.includes(d));
+    let cc=(S.opt&&S.opt.crossCover)||"necessary";
+    if(cc==="never")pool=pool.filter(s=>s.emp===sh.emp);
     if(!pool.length)return null;
     let fresh=pool.filter(s=>!assignedToday(d,s.id));
     if(!fresh.length)return null;
     let des=shiftDesir(sh,d),B={};
     fresh.forEach(s=>{B[s.id]=fairBal(s.id)});
-    fresh.sort((a,b)=>((a.emp===sh.emp?0:1)-(b.emp===sh.emp?0:1))||(des<0?(B[b.id]-B[a.id]):(B[a.id]-B[b.id]))||(h[a.id]-h[b.id])||(Math.random()-.5));
+    let empPref=s=>(cc==="always"?0:(s.emp===sh.emp?0:1));
+    fresh.sort((a,b)=>(empPref(a)-empPref(b))||((((a.pref||"any")===sh.kind?0:1)-((b.pref||"any")===sh.kind?0:1)))||(des<0?(B[b.id]-B[a.id]):(B[a.id]-B[b.id]))||(h[a.id]-h[b.id])||(Math.random()-.5));
     for(let s of fresh){getSlot(d,sh.id).push(s.id);let bad=fatigueIssuesFor(s.id).length>0;getSlot(d,sh.id).pop();if(!bad)return s}
     return null;
   };
   {
     let perDay=[...Array(7).keys()].map(()=>[]);
-    for(let d=0;d<7;d++)for(let sh of S.shifts){
+    let shOrder=[...S.shifts].sort((a,b)=>(a.emp==="PT"?0:1)-(b.emp==="PT"?0:1));
+    for(let d=0;d<7;d++)for(let sh of shOrder){
       if(!shiftRange(sh,d))continue;
       let wants={};
       S.roles.forEach(role=>{let want=Math.max(0,(sh.need[role]||0)-manualCover(d,sh,role).length);wants[role]=want});
-      if(S.opt.mgrCovers&&managerOnDuty(d,sh).length){
-        let order=[...S.roles].sort((a,b)=>(wants[b]-wants[a])||((b==="Budtender")-(a==="Budtender")));
-        if(wants[order[0]]>0)wants[order[0]]--;
-      }
+      if((wants.Budtender||0)>0&&budTolOK(d,sh))wants.Budtender--;
       S.roles.forEach(role=>{for(let i=0;i<wants[role];i++)perDay[d].push({sh,role})});
     }
     let daySeq=[...Array(7).keys()];
@@ -880,8 +926,144 @@ function autoGenerate(){
       }
     }
   }
-  snapshotFairness();
-  save();renderGrid();renderIssues();
+}
+function xcStats(){
+let cur={},opp={};
+S.staff.forEach(s=>{if(s.emp!=="FT"||s.manual)return;cur[s.id]=0;opp[s.id]=0});
+let ptSlots=0,ptFilled=0,manualN=0,ftXC=0;
+S.shifts.forEach(sh=>{
+if(sh.emp!=="PT")return;
+for(let d=0;d<7;d++){
+if(!shiftRange(sh,d))continue;
+ptSlots+=S.roles.reduce((a,r)=>a+(sh.need[r]||0),0);
+getSlot(d,sh.id).forEach(id=>{let s=staffById(id);if(!s)return;if(s.manual){manualN++;return}if(s.emp==="PT")ptFilled++;else if(s.emp==="FT"){ftXC++;cur[s.id]=(cur[s.id]||0)+1}});
+}
+});
+S.staff.forEach(s=>{if(s.emp!=="FT"||s.manual)return;S.shifts.forEach(sh=>{if(sh.emp!=="PT")return;let nd=sh.need[s.role]||0;if(!nd)return;for(let d=0;d<7;d++){if(s.off.includes(d))continue;if(!shiftRange(sh,d))continue;opp[s.id]+=nd}})});
+let ids=Object.keys(opp).filter(id=>opp[id]>0);
+let H=S.fairHist||{},wk=Object.keys(H).filter(w=>w!==S.weekStart&&H[w]);
+let hist={};ids.forEach(id=>{hist[id]=0});
+wk.forEach(w=>{ids.forEach(id=>{let e=H[w][id];if(e)hist[id]+=e.xc||0})});
+let navg={};ids.forEach(id=>{navg[id]=wk.length?hist[id]/wk.length:0});
+let totGot=ids.reduce((a,id)=>a+navg[id]+(cur[id]||0),0);
+let totOpp=ids.reduce((a,id)=>a+opp[id],0);
+let chi=0;
+if(totGot>0&&totOpp>0)ids.forEach(id=>{let exp=totGot*opp[id]/totOpp;chi+=Math.pow(navg[id]+(cur[id]||0)-exp,2)/Math.max(exp,0.5)});
+let per=ids.filter(id=>(cur[id]||0)>0||navg[id]>0).map(id=>{let s=staffById(id);return{id,name:s?s.name:id,cur:cur[id]||0,hist:Math.round(navg[id]*10)/10,opp:opp[id]}}).sort((a,b)=>b.cur-a.cur);
+let sorted=ids.map(id=>cur[id]||0).sort((a,b)=>b-a);
+let top=sorted.length&&sorted[0]>0?per.find(p=>p.cur===sorted[0]):null;
+let runner=sorted.length>1?sorted[1]:0;
+let concentrated=!!(top&&ftXC>0&&ids.length>=3&&top.cur/ftXC>=0.5&&runner<=top.cur/2);
+let sharers=ids.filter(id=>(cur[id]||0)>0).length;
+return{ptSlots,ptFilled,manualN,ftXC,per,eligible:ids.length,concentrated,top,sharers,chi:Math.round(chi*100)/100};
+}
+function scoreSchedule(){
+let parts={gaps:0,leadgap:0,sub:0,amGaps:0,amSubs:0,pmGaps:0,pmSubs:0,fatigue:0,off:0,hours:0,mgr:0,overlap:0,hourImb:0,nightR:0,weR:0,mornR:0,eveR:0,pattern:0,hist:0,pref:0,xc:0,rand:0};
+validateSchedule().forEach(t=>{if(t.startsWith("Lead coverage gap")||t.startsWith("No manager"))parts.leadgap++;else if(t.startsWith("Short:")||t.includes("closed day"))parts.gaps++;else if(t.includes("day off"))parts.off++;else if(t.includes("hour cap"))parts.hours++;else if(t.includes("double-booked"))parts.overlap++;else parts.fatigue++});
+let CS=coverageStats();parts.sub=CS.subs;parts.amGaps=CS.amGaps;parts.amSubs=CS.amSubs;parts.pmGaps=CS.pmGaps;parts.pmSubs=CS.pmSubs;
+let Lmap={};S.staff.forEach(s=>{Lmap[s.id]=personShifts(s.id)});
+let act=S.staff.filter(s=>!s.manual&&Lmap[s.id].length>0);
+let utils=act.map(s=>paidHours(s)/Math.max(1,s.max));
+let mean=utils.reduce((a,b)=>a+b,0)/Math.max(1,utils.length);
+parts.hourImb=Math.sqrt(utils.reduce((a,u)=>a+(u-mean)*(u-mean),0)/Math.max(1,utils.length));
+let qual=act.filter(s=>Lmap[s.id].length>=3);if(qual.length<2)qual=act;
+let elig=(s,k)=>S.shifts.some(sh=>sh.kind===k&&(sh.need[s.role]||0)>0);
+let shareR=(k,f)=>{let set=qual.filter(s=>k==="WE"||elig(s,k));if(set.length<2)set=qual;let v=set.map(s=>{let L=Lmap[s.id];return L.length?f(L)/L.length:0});return v.length?Math.max(...v)-Math.min(...v):0};
+parts.mornR=shareR("AM",L=>L.filter(x=>x.kind==="AM").length);
+parts.eveR=shareR("MID",L=>L.filter(x=>x.kind==="MID").length);
+parts.nightR=shareR("PM",L=>L.filter(x=>x.kind==="PM").length);
+parts.weR=shareR("WE",L=>L.filter(x=>x.day>=5).length);
+act.forEach(s=>{let L=personShifts(s.id);for(let i=1;i<L.length;i++)if(L[i].kind===L[i-1].kind&&L[i].day===L[i-1].day+1)parts.pattern++});
+let H=S.fairHist||{},wk=Object.keys(H).filter(w=>w!==S.weekStart&&H[w]);
+if(wk.length)act.forEach(s=>{let a={AM:0,MID:0,PM:0,WE:0},n=0;wk.forEach(w=>{let e=H[w][s.id];if(!e)return;n++;a.AM+=e.AM||0;a.MID+=e.MID||0;a.PM+=e.PM||0;a.WE+=e.WE||0});if(!n)return;let c={AM:0,MID:0,PM:0,WE:0};personShifts(s.id).forEach(x=>{if(c[x.kind]!=null)c[x.kind]++;if(x.day>=5)c.WE++});parts.hist+=Math.abs(c.AM-a.AM/n)+Math.abs(c.MID-a.MID/n)+Math.abs(c.PM-a.PM/n)+Math.abs(c.WE-a.WE/n)});
+act.forEach(s=>{if(s.pref&&s.pref!=="any")personShifts(s.id).forEach(x=>{if(x.kind!==s.pref)parts.pref++})});
+parts.xc=xcStats().chi;
+parts.rand=Math.random()*0.5;
+let total=parts.gaps*10000+parts.leadgap*10000+parts.fatigue*10000+parts.off*10000+parts.hours*10000+parts.overlap*10000+parts.hourImb*120+parts.nightR*60+parts.mornR*25+parts.eveR*25+parts.weR*40+parts.pattern*12+parts.hist*5+parts.pref*6+parts.xc*12+parts.rand;
+return{total,parts};
+}
+function validateSchedule(){
+let bad=[];
+S.shifts.forEach(sh=>{for(let d=0;d<7;d++)shiftShortage(d,sh).forEach(t=>bad.push(t))});
+S.staff.forEach(s=>{
+if(s.off.some(d=>S.shifts.some(sh=>getSlot(d,sh.id).includes(s.id))||S.manual[d+"__"+s.id]))bad.push(`${s.name} scheduled on a day off`);
+if(paidHours(s)>s.max+1e-6)bad.push(`${s.name} over hour cap (${paidHours(s)}/${s.max})`);
+fatigueIssuesFor(s.id).forEach(t=>bad.push(`${s.name}: ${t}`));
+for(let d=0;d<7;d++){let iv=[];S.shifts.forEach(sh=>{if(getSlot(d,sh.id).includes(s.id)){let r=shiftRange(sh,d);if(r)iv.push([r.s,r.e,sh.tkey])}});let m=S.manual[d+"__"+s.id];if(m)iv.push([m.s,m.e,"manual"]);iv.sort((a,b)=>a[0]-b[0]);for(let i=1;i<iv.length;i++)if(iv[i][0]<iv[i-1][1])bad.push(`${s.name} double-booked ${DAYS[d]} (${iv[i-1][2]} overlaps ${iv[i][2]})`)}
+});
+{let B=(S.opt&&S.opt.laborBudget)||0;if(B&&totalLabor()>B+1e-6)bad.push(`Schedule requires ${totalLabor()} hours, but weekly labor budget is ${B} hours (over hour cap)`);}
+return bad;
+}
+function rejectionNotice(bad){
+let m=modalCtn;m.hidden=false;m.innerHTML="";
+let box=document.createElement("div");box.className="modal";box.onclick=e=>{if(e.target===box)closeModal()};
+let inner=document.createElement("div");inner.className="modalBox";
+let ordered=[...bad.filter(t=>t.includes("weekly labor budget")),...bad.filter(t=>!t.includes("weekly labor budget"))];
+inner.innerHTML=`<div class="row" style="justify-content:space-between"><strong>Schedule rejected — ${bad.length} problem${bad.length===1?"":"s"}</strong><button class="ghost small" onclick="closeModal()">Close</button></div><div class="warn" style="margin-top:8px">${ordered.slice(0,14).map(x=>"• "+x).join("<br>")}${bad.length>14?`<br>…and ${bad.length-14} more`:""}</div><div class="muted" style="margin-top:8px">Previous schedule restored. Fix the issues above, then generate again.</div>`;
+box.appendChild(inner);m.appendChild(box);
+}
+function testLaborBudget(){
+let res=[],ok=(n,c)=>res.push((c?"PASS":"FAIL")+" "+n);
+let snap=JSON.stringify({assign:S.assign,manual:S.manual||{},opt:S.opt||{}});
+try{
+S.assign={};S.manual=S.manual||{};S.opt=S.opt||{};
+let sh=S.shifts[0],s=S.staff.find(x=>!x.manual&&x.role!=="Manager");
+S.assign[key(0,sh.id)]=[s.id];
+let hrs=totalLabor();
+S.opt.laborBudget=450;
+ok("450 budget does not flag a small schedule",!validateSchedule().some(t=>t.includes("weekly labor budget")));
+S.opt.laborBudget=1;
+let f=validateSchedule().filter(t=>t.includes("weekly labor budget"));
+ok("low budget rejects with explicit hours message",f.length===1&&f[0].includes(""+hrs)&&f[0].includes("1"));
+delete S.opt.laborBudget;
+ok("blank budget means no cap",!validateSchedule().some(t=>t.includes("weekly labor budget")));
+S.opt.laborBudget=450;
+let before=JSON.stringify(S.assign);
+autoGenerate();closeModal();
+ok("generate with 450 keeps prior assignments",JSON.stringify(S.assign)===before);
+ok("generate with 450 leaves hours untouched",totalLabor()===hrs);
+}finally{let r=JSON.parse(snap);S.assign=r.assign;S.manual=r.manual;S.opt=r.opt;save();renderAll();closeModal()}
+return res;
+}
+let lastGenBackup=null;
+function autoGenerate(){
+if(!S.staff.length||!S.shifts.length)return;
+let backup=JSON.stringify({assign:S.assign,manual:S.manual||{}});
+lastGenBackup=backup;
+let cur=scoreSchedule().total,best=null,lastBad=[];
+for(let a=0;a<50;a++){buildSchedule();let v=validateSchedule();if(v.length){lastBad=v;continue}let s=scoreSchedule().total;if(!best||s<best.score)best={assign:JSON.stringify(S.assign),score:s}}
+if(!best){let r=JSON.parse(backup);S.assign=r.assign;S.manual=r.manual;save();renderAll();rejectionNotice(lastBad.length?lastBad:["No valid schedule found"]);return}
+if(best.score<cur){S.assign=JSON.parse(best.assign);snapshotFairness();save();renderAll();qualityModal(true)}
+else{let r=JSON.parse(backup);S.assign=r.assign;S.manual=r.manual;save();renderAll();qualityModal(false)}
+}
+function undoGenerate(){if(!lastGenBackup)return;let r=JSON.parse(lastGenBackup);S.assign=r.assign;S.manual=r.manual;snapshotFairness();save();renderAll();closeModal()}
+function qualityModal(applied){
+let P=scoreSchedule().parts;
+let X=xcStats();
+let g=r=>r<=0.4?"Good":(r<=0.7?"Fair":"Needs work");
+let row=(ok,t)=>`<div>${ok?"✓":"✗"} ${t}</div>`;
+let gr=(label,r)=>`<div>${label} balance: <strong>${g(r)}</strong></div>`;
+let m=modalCtn;m.hidden=false;m.innerHTML="";
+let box=document.createElement("div");box.className="modal";box.onclick=e=>{if(e.target===box)closeModal()};
+let inner=document.createElement("div");inner.className="modalBox";
+inner.innerHTML=`<div class="row" style="justify-content:space-between"><strong>Schedule Quality</strong><button class="ghost small" onclick="closeModal()">Close</button></div>`
++`<div style="margin-top:8px"><strong>${applied?"New schedule applied":"Current schedule kept"}</strong><div class="muted">${applied?"It scored better than the previous schedule.":"It scored better than the new candidate."}</div></div>`
++`<div style="margin-top:8px"><strong>Checks</strong>`
++row(!P.gaps,`Budtender gaps: ${P.gaps}`)
++row(!P.leadgap,`Lead/Manager coverage gaps: ${P.leadgap}`)
++row(!P.off,`Requested-off conflicts: ${P.off}`)
++row(!P.hours,`Hours within limits`)
++row(!P.fatigue,`Fatigue violations: ${P.fatigue}`)
++`<div>• Manager substitution active on ${P.sub} shift${P.sub===1?"":"s"}</div>`
++`<div>Opening: ${P.amGaps?P.amGaps+" shortage(s)":(P.amSubs?`Covered with substitution (${P.amSubs})`:"Fully covered")}</div>`
++`<div>Closing: ${P.pmGaps?P.pmGaps+" shortage(s)":(P.pmSubs?`Covered with substitution (${P.pmSubs})`:"Fully covered")}</div>`
++`</div><div style="margin-top:8px"><strong>Fairness</strong>`
++gr("Morning",P.mornR)+gr("Evening",P.eveR)+gr("Night",P.nightR)+gr("Weekend",P.weR)
++`</div><div style="margin-top:8px"><strong>Cross-cover</strong>`
++`<div>PT-designated shifts: ${X.ptSlots} · filled by PT staff: ${X.ptFilled}${X.manualN?` · manual cover: ${X.manualN}`:""} · FT cross-cover: ${X.ftXC}</div>`
++(X.ftXC?`<div>${X.per.map(p=>`${p.name} ${p.cur} (avg ${p.hist}/wk)`).join(" · ")}</div><div>${X.concentrated?`Concentrated on ${X.top.name} (${X.top.cur} of ${X.ftXC})`:`Shared across ${X.sharers} of ${X.eligible} eligible FT staff`}</div>`:`<div>No FT cross-cover needed.</div>`)
++`</div>`+(applied?`<div class="row" style="margin-top:12px;justify-content:flex-end"><button class="ghost small" onclick="undoGenerate()">Undo</button></div>`:"");
+box.appendChild(inner);m.appendChild(box);
 }
 async function ensurePDFLibs(){
   if(window.jspdf && window.jspdf.jsPDF && (window.jspdf.API && window.jspdf.API.autoTable || window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable))return;
@@ -971,6 +1153,12 @@ function renderManagers(){
     if(m){let len=m.e-m.s;tot+=len/60-(len>=480?0.5:0)}
   }
   mgrTot.textContent=`${st.name}: ${Math.round(tot*2)/2}/${st.max} hrs this week`;
+  mgrMax.value=st.max;
+  mgrMax.oninput=()=>{st.max=Math.max(0,parseInt(mgrMax.value||"0"));save();renderManagers();renderStaff();renderIssues()};
+  let LB=(S.opt&&S.opt.laborBudget)||0;
+  laborBudget.value=LB||"";
+  laborBudget.oninput=()=>{S.opt=S.opt||{};let v=parseFloat(laborBudget.value);if(!v||v<=0)delete S.opt.laborBudget;else S.opt.laborBudget=v;save();renderManagers();renderIssues()};
+  laborTot.textContent=LB?`${totalLabor()}/${LB} hrs used`:"No weekly cap";
 }
 function saveMgrDay(id,d,sv,ev){
   if(!sv||!ev)return;
@@ -1038,4 +1226,3 @@ newsIdx=0;renderNews();startNewsTimer();
 }
 load().then(()=>{renderAll();goModule(2,false);refreshNews()});
 </script>
-
