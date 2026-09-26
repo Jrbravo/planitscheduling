@@ -1,1 +1,1041 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
+body{text-align:left;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;color:#fff;background-color:#0A0C10;background-image:linear-gradient(rgba(10,12,16,.87),rgba(10,12,16,.87)),url("https://user.uploads.dev/file/285a01c3c3f0c6b0808256df9b61f91f.jpg"),linear-gradient(rgba(45,156,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(45,156,255,.045) 1px,transparent 1px);background-size:auto,cover,44px 44px,44px 44px;background-position:center,center top,0 0,0 0;background-repeat:repeat,no-repeat,repeat,repeat;background-attachment:scroll,fixed,scroll,scroll}
+.wrap{max-width:1150px;margin:0 auto;padding:16px 16px 60px}
+.topbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:14px;background:linear-gradient(180deg,rgba(26,30,39,.94),rgba(13,16,21,.94));border:1px solid #2a3340;border-bottom:2px solid #2D9CFF;border-radius:14px;padding:14px 16px;box-shadow:0 18px 40px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(10px)}
+.footerbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:14px;background:linear-gradient(180deg,rgba(26,30,39,.94),rgba(13,16,21,.94));border:1px solid #2a3340;border-top:2px solid #2D9CFF;border-radius:14px;padding:14px 16px;box-shadow:0 18px 40px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(10px)}
+.newsbox{display:flex;align-items:center;gap:8px;flex:1;min-width:280px;max-width:600px;background:rgba(0,0,0,.25);border:1px solid #232a33;border-radius:10px;padding:8px 10px}
+.newsmain{flex:1;min-width:0}
+#newsText{font-size:13px;line-height:1.35}
+.newslink{color:#fff;font-weight:700;text-decoration:none}
+.newslink:hover{color:#2D9CFF;text-decoration:underline}
+.newsdesc{color:#9aa4b2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:2px}
+.newssrc{font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+#newsCount{font-size:10px;text-align:right}
+.newsarrow{background:none;background:transparent;border:1px solid #2a3340;border-radius:8px;box-shadow:none;color:#2D9CFF;font-size:20px;line-height:1;padding:4px 10px;cursor:pointer;flex:none}
+.newsarrow:hover{border-color:#2D9CFF;box-shadow:0 0 10px rgba(45,156,255,.4)}
+.locbadge{font-size:11px;color:#8b95a5;letter-spacing:1.5px;text-transform:uppercase;padding:0 4px 4px}
+.brand{display:flex;gap:12px;align-items:center}
+.card > strong{text-transform:uppercase;letter-spacing:2px;font-size:13px}
+.tblock,.shiftTime,.evday,#weekLabelEl,.mark{font-family:'Roboto Mono',ui-monospace,SFMono-Regular,monospace}
+#weekLabelEl{color:#2D9CFF;font-size:12px}
+.evday{color:#2D9CFF;font-size:12px;min-width:36px}
+#eventListEl .staffItem{border-left:2px solid #2D9CFF;border-radius:4px}
+.applogo{height:76px;width:76px;border-radius:50%;object-fit:cover;flex:none;border:2px solid rgba(45,156,255,.6);box-shadow:0 0 18px rgba(45,156,255,.5)}
+.brand .muted{text-transform:uppercase;letter-spacing:2px;font-size:10px}
+h1{font-size:26px;letter-spacing:3px;margin:0;color:#fff;font-weight:700}
+.card{background:linear-gradient(180deg,rgba(26,30,39,.92),rgba(15,18,24,.92));border:1px solid #2a3340;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 18px 40px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(10px)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+input,select,button{font-size:14px;padding:7px 10px;border-radius:4px;border:1px solid #2c3540}
+input,select{background:#1E2229;color:#fff}
+button{background:transparent;color:#fff;border:1px solid #2d9cff;box-shadow:0 0 0 2px rgba(45,156,255,.22),0 0 10px rgba(45,156,255,.5);cursor:pointer;font-weight:600}
+button:hover{box-shadow:0 0 0 3px rgba(45,156,255,.45),0 0 16px rgba(45,156,255,.8)}
+button.ghost{background:transparent;color:#fff}
+button.inv{background:#111827;color:#fff;border-color:#e0e7ff;box-shadow:inset 0 0 0 2px rgba(224,231,255,.35),inset 0 0 10px rgba(165,180,252,.55)}
+button.inv:hover{box-shadow:inset 0 0 0 3px rgba(224,231,255,.55),inset 0 0 16px rgba(165,180,252,.85)}
+button.small{padding:4px 8px;font-size:12px}
+.staffItem{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px;border:1px solid #232a33;border-radius:4px;margin-bottom:6px;background:#161B22}
+.staffItem input[type=text]{width:110px}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;color:#fff;margin:1px 2px 1px 0}
+.tag{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11px;font-weight:700;background:#242c36;color:#E6EBF2;margin-left:4px}
+.schedWrap{overflow-x:auto}
+table.sched{border-collapse:collapse;width:100%;table-layout:fixed}
+table.sched th,table.sched td{border:1px solid #242c36;padding:8px;vertical-align:top;text-align:left}
+table.sched th{background:#161B22;font-size:13px}
+.shiftTime{font-size:12px;color:#A9B4C6}
+.slot{min-height:56px;cursor:pointer;border-radius:8px;padding:4px}
+.slot:hover{background:#1E2229}.mchip:hover{background:#1E2229}
+.slot .empty{font-size:12px;color:#9ca3af}
+.warn{background:#1C1114;border:1px solid #5C1A1E;border-left:3px solid #FF3B30;color:#F5A3A3;border-radius:4px;padding:8px 10px;font-size:13px;margin-top:8px;box-shadow:0 0 12px rgba(255,59,48,.15)}
+.okline{background:#0E1A13;border:1px solid #1C4A2E;border-left:3px solid #30D158;color:#8FDF9F;border-radius:4px;padding:8px 10px;font-size:13px;margin-top:8px}
+.dayoff label{font-size:12px;margin-right:6px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modalBox{background:#111318;border-radius:6px;padding:16px;max-width:460px;width:100%;max-height:82vh;overflow:auto}
+.chk{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #232a33}
+.muted{font-size:12px;color:#A9B4C6}
+.bar{height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:4px}
+.bar > div{height:100%;background:#111827}
+table.needs{border-collapse:collapse;width:100%}
+table.needs th,table.needs td{border:1px solid #242c36;padding:6px;font-size:13px;text-align:center}
+table.needs th{background:#161B22}
+table.needs input{width:52px;text-align:center}
+.hoursRow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #232a33;font-size:14px}
+.hoursRow b{width:44px}
+.person{border:1px solid #232a33;border-radius:6px;padding:10px 12px;margin-bottom:8px;background:#111318}
+.personHead{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dot{width:10px;height:10px;border-radius:99px;display:inline-block;flex:none}
+.shifts{margin-top:4px}
+.shiftRow{display:flex;gap:10px;align-items:center;padding:5px 0 5px 22px;border-top:1px solid #232a33;font-size:14px}
+.shiftRow .d{width:96px;font-weight:600;flex:none}
+.shiftRow .t{color:#E6EBF2;font-variant-numeric:tabular-nums}
+.mchip{padding:3px 4px;border-radius:8px;cursor:pointer}
+
+#hoursEl input[type=time]{border-color:#34d399;box-shadow:0 0 0 2px rgba(52,211,153,.18),0 0 8px rgba(52,211,153,.35)}
+#hoursEl input[type=time]:focus{outline:none;box-shadow:0 0 0 3px rgba(52,211,153,.35),0 0 12px rgba(52,211,153,.55)}
+#mgrDays input[type=time]{border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,.25),0 0 8px rgba(124,58,237,.45)}
+#mgrDays input[type=time]:focus{outline:none;box-shadow:0 0 0 3px rgba(124,58,237,.45),0 0 12px rgba(124,58,237,.65)}
+::selection{background:rgba(45,156,255,.4)}
+::-webkit-scrollbar{height:10px;width:10px}
+::-webkit-scrollbar-thumb{background:#2c3540;border-radius:99px;border:2px solid #0A0C10}
+::-webkit-scrollbar-track{background:transparent}
+input[type=checkbox]{accent-color:#2d9cff}
+input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-calendar-picker-indicator{filter:invert(.75)}
+input:focus,select:focus{outline:none;border-color:#2d9cff;box-shadow:0 0 0 2px rgba(45,156,255,.25),0 0 10px rgba(45,156,255,.5)}
+button{transition:box-shadow .15s ease,transform .05s ease}
+button:active{transform:scale(.97)}
+details.card[open] > summary{margin-bottom:12px}
+details.card > summary{text-transform:uppercase;letter-spacing:2px;font-size:13px}
+details.card > summary:focus-visible{outline:2px solid #2d9cff;outline-offset:2px}
+.pill{box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tblock{border:1px solid rgba(255,255,255,.25);box-shadow:0 1px 5px rgba(0,0,0,.35);transition:transform .08s ease}
+.tblock:hover{transform:translateY(-1px)}
+table.sched tr:hover td{background:rgba(45,156,255,.06)}
+table.sched tr:first-child th{position:sticky;top:0;z-index:2}
+table.sched th:first-child{position:sticky;left:0;z-index:1;width:96px}
+table.sched tr:first-child th:first-child{z-index:3}
+.modalBox{border:1px solid #2a3340;box-shadow:0 24px 60px rgba(0,0,0,.7),0 0 30px rgba(45,156,255,.15)}
+.legend > span{background:#161B22;border:1px solid #232a33;border-radius:4px;padding:3px 8px}
+.warn{box-shadow:0 0 12px rgba(220,38,38,.25)}
+.okline{box-shadow:0 0 12px rgba(34,197,94,.2)}
+.staffItem{transition:border-color .15s ease}
+.staffItem:hover{border-color:#2c3540}
+.layout{display:grid;grid-template-columns:190px minmax(0,1fr) 250px;gap:14px;align-items:start}
+.maincol{min-width:0}
+.maincol details.card > summary{display:none}
+.maincol details.card{display:none}
+.maincol details.card.mactive{display:block}
+.sideL{position:sticky;top:12px;display:flex;flex-direction:column;gap:8px}
+.navbtn{display:flex;gap:10px;align-items:center;text-align:left;padding:10px 12px;background:linear-gradient(180deg,rgba(26,30,39,.92),rgba(15,18,24,.92));border:1px solid #2a3340;border-radius:10px;color:#fff;cursor:pointer;font-size:13px;font-weight:600;box-shadow:0 10px 22px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05);backdrop-filter:blur(10px);width:100%;transition:transform .12s ease,box-shadow .15s ease}
+.navbtn:hover{border-color:#2D9CFF;transform:translateY(-1px);box-shadow:0 14px 26px rgba(0,0,0,.55),0 0 14px rgba(45,156,255,.35),inset 0 1px 0 rgba(255,255,255,.06)}
+.navbtn .ic{color:#2D9CFF;font-family:'Roboto Mono',monospace;width:18px;text-align:center;flex:none}
+.navbtn.active{border-color:#2D9CFF;box-shadow:0 14px 26px rgba(0,0,0,.55),0 0 14px rgba(45,156,255,.45),inset 0 1px 0 rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(28,36,50,.94),rgba(18,24,34,.94))}
+.navbtn .ncount{margin-left:auto;color:#A9B4C6;font-size:11px}
+.sidecol{display:flex;flex-direction:column;gap:14px;position:sticky;top:12px}
+.sidecol .card{margin-bottom:0}
+.infohead{text-transform:uppercase;letter-spacing:2px;font-size:13px;font-weight:700;margin-bottom:6px}
+.inforow{display:flex;gap:8px;justify-content:space-between;padding:5px 0;border-bottom:1px solid #1c2330;font-size:13px}
+.infosec{text-transform:uppercase;letter-spacing:2px;font-size:11px;color:#A9B4C6;margin:10px 0 4px}
+.skillrow{padding:4px 8px;font-size:13px;background:#161B22;border:1px solid #232a33;border-radius:4px;margin-bottom:4px}
+.tmono{font-family:'Roboto Mono',monospace;font-size:11px;opacity:.92}
+.tblock{padding:7px 4px;text-align:center}
+.tblock .tt{font-size:13px;font-weight:700;font-family:'Roboto Mono',monospace;letter-spacing:.5px;line-height:1.25;white-space:nowrap}
+.tblock .ttsep{height:1px;background:rgba(255,255,255,.45);margin:2px 8px}
+.tblock{cursor:grab;user-select:none;-webkit-user-select:none}
+.tblock:active{cursor:grabbing}
+.tblock.dropHi{outline:2px solid #2D9CFF;outline-offset:1px}
+table.sched td.dropHi{outline:2px dashed #2D9CFF;outline-offset:-2px}
+table.sched td{padding:6px 4px}
+#tipEl{position:fixed;z-index:100;max-width:240px;background:#0D1015;border:1px solid #2D9CFF;border-radius:6px;padding:10px 12px;font-size:12px;box-shadow:0 0 16px rgba(45,156,255,.4);pointer-events:none;text-align:left}
+.tipname{font-weight:700;font-size:13px}
+.tiprow{display:flex;justify-content:space-between;margin-top:4px}
+.tipsec{text-transform:uppercase;letter-spacing:1.5px;font-size:10px;color:#A9B4C6;margin:8px 0 2px}
+.tipdays{font-family:'Roboto Mono',monospace;font-size:11px}
+.schedWrap{position:relative}
+.schedWrap::after{content:"";position:absolute;left:4%;right:4%;bottom:0;height:90px;background:radial-gradient(ellipse at center bottom,rgba(45,156,255,.30),transparent 70%);pointer-events:none}
+table.sched tr:first-child th{text-transform:uppercase;letter-spacing:1px}
+.evst{font-size:11px;cursor:pointer;color:#2D9CFF;white-space:nowrap}
+.evst[data-st="Completed"]{color:#30D158}
+.evst[data-st="Pending"]{color:#F5A524}
+@media(max-width:1080px){.layout{grid-template-columns:1fr}.sideL{position:static;flex-direction:row;flex-wrap:wrap}.sideL .navbtn{width:auto}.sidecol{position:static}}
+.empty{font-size:12px;color:#9ca3af}
+.tblock{border-radius:3px;padding:5px 6px;margin:2px 0;cursor:pointer;font-weight:500;font-size:12px;font-variant-numeric:tabular-nums;letter-spacing:.5px;line-height:1.3;border-left:3px solid currentColor}
+.tblock:hover{filter:brightness(.95)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:5px;vertical-align:-2px;border:1px solid rgba(0,0,0,.2)}
+details summary{cursor:pointer}
+details.card > summary{border:1px solid #2d9cff;border-radius:4px;padding:7px 10px;font-weight:600;text-align:center;box-shadow:0 0 0 2px rgba(45,156,255,.22),0 0 10px rgba(45,156,255,.5);list-style:none}
+details.card > summary::-webkit-details-marker{display:none}
+details.card > summary::marker{content:""}
+details.card > summary:hover{box-shadow:0 0 0 3px rgba(45,156,255,.45),0 0 16px rgba(45,156,255,.8)}
+details:not([open]) > :not(summary){display:none}
+@media print{.noPrint{display:none}.wrap{max-width:none;padding:0}body{background:#fff;color:#111827}.card{background:#fff;border-color:#ddd;box-shadow:none}table.sched th{background:#eee!important}table.sched th,table.sched td{box-shadow:none}.muted{color:#555!important}input,select{background:#fff;color:#111827}.staffItem,.person{background:#fff}}
+</style>
+<div class="wrap">
+<div id="locBadge" class="locbadge noPrint"></div>
+<div class="topbar">
+<div class="brand"><img class="applogo" src="https://user.uploads.dev/file/003968fe6da08c3366c2616ca0f25ede.jpg" alt="Plan-It Scheduling logo"><div><div class="muted">Mission control for your crew's week.</div></div></div>
+<div class="newsbox noPrint" id="newsBox">
+<button class="newsarrow" onclick="newsMove(-1)" aria-label="Previous article">‹</button>
+<div class="newsmain"><div id="newsText"><span class="muted">Loading Ohio cannabis headlines…</span></div><div class="muted" id="newsCount"></div></div>
+<button class="newsarrow" onclick="newsMove(1)" aria-label="Next article">›</button>
+</div>
+</div>
+<div class="layout">
+<nav class="sideL noPrint">
+<button class="navbtn active" data-m="2" onclick="goModule(2)"><span class="ic">▦</span>01 · Schedule</button>
+<button class="navbtn" data-m="0" onclick="goModule(0)"><span class="ic">▤</span>02 · Shifts</button>
+<button class="navbtn" data-m="1" onclick="goModule(1)"><span class="ic">◈</span>03 · Manager</button>
+<button class="navbtn" data-m="3" onclick="goModule(3)"><span class="ic">≡</span>04 · Staffing</button>
+<button class="navbtn" data-m="4" onclick="goModule(4)"><span class="ic">●</span>05 · Staff<span class="ncount" id="navStaffCount"></span></button>
+<button class="navbtn" data-m="ev" onclick="goEvents()"><span class="ic">◆</span>Events</button>
+</nav>
+<div class="maincol">
+<div class="card noPrint">
+<div class="row">
+<label>Week of <input type="date" id="weekInput"></label>
+<button class="ghost small" onclick="shiftWeek(-1)">← Prev</button>
+<button class="ghost small" onclick="shiftWeek(1)">Next →</button>
+<button class="ghost small" onclick="thisWeek()">This week</button>
+<span class="muted" id="weekLabelEl"></span>
+</div>
+</div>
+<details class="card noPrint" open>
+<summary>01 // Shifts</summary>
+<div class="row" style="margin:8px 0"><button class="ghost small" onclick="copyMonToAll()">Copy Mon to all days</button></div>
+<div id="hoursEl"></div>
+</details>
+<details class="card noPrint" open>
+<summary>02 // Manager</summary>
+<div class="row" style="margin:8px 0"><label>Manager <select id="mgrSel"></select></label><span class="muted" id="mgrTot"></span></div>
+<div id="mgrDays"></div>
+</details>
+<details class="card" open>
+<summary>03 // Schedule</summary>
+<div class="muted noPrint" style="margin:6px 0">click a shift to edit</div>
+<div class="row noPrint" style="margin-top:8px">
+<label class="muted"><input type="checkbox" id="floatChk"> Throw in extra PT helpers</label>
+<label class="muted">up to <input type="number" id="floatN" min="0" max="5" style="width:48px"> per shift, picked at random</label>
+<label class="muted"><input type="checkbox" id="mgrCovChk"> Manager on duty covers 1 open spot</label>
+</div>
+<div class="muted noPrint" style="margin-top:4px">Tip: click any shift on the schedule to add or remove people.</div>
+<div class="schedWrap"><table class="sched" id="schedTable"></table><div id="personListEl"></div></div>
+<div id="legendEl" class="legend"></div>
+<div id="issuesEl"></div>
+</details>
+<details class="card noPrint">
+<summary>04 // Staffing</summary>
+<div class="row" style="margin:8px 0"><span class="muted">Roles:</span><span id="rolesEl" class="row"></span><input id="newRoleInput" placeholder="New role" style="width:110px"><button class="small" onclick="addRole()">+ Role</button></div>
+<div class="schedWrap"><table class="needs" id="needsTable"></table></div>
+<div class="muted">Times auto-compute from store hours. Set exact times for a day by clicking its schedule cell.</div>
+</details>
+<details class="card noPrint">
+<summary>05 // Staff (<span id="staffCountEl">0</span>)</summary>
+<div class="row" style="margin:8px 0"><button class="small inv" onclick="addStaff()">+ Add</button></div>
+<div id="staffListEl"></div>
+</details>
+</div>
+<aside class="sidecol">
+<div class="card noPrint">
+<strong>Events</strong>
+<div class="row" style="margin-top:8px">
+<input id="eventTextInput" placeholder="Add an event..." style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')addEvent()">
+<select id="eventDaySel"></select>
+<button class="small" onclick="addEvent()">+ Add</button>
+</div>
+<div id="eventListEl" style="margin-top:8px"></div>
+</div>
+</div>
+</aside>
+</div>
+<div class="footerbar noPrint">
+<button id="autoBtn" onclick="autoGenerate()">Auto-generate</button>
+<button class="ghost" onclick="exportPDF()">Export PDF</button>
+<button class="ghost" onclick="window.print()">Print</button>
+<button class="ghost" onclick="clearWeek()">Clear week</button>
+<button class="ghost" onclick="openSettings()">Settings</button>
+</div>
+<div id="modalCtn" hidden></div>
+<script>
+let S = {v:5,staff:[],shifts:[],roles:[],hours:[],times:{},manual:{},assign:{},weekStart:null};
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const COLORS=["#2563eb","#059669","#d97706","#dc2626","#7c3aed","#0891b2","#db2777","#4d7c0f"];
+const FT_MIN=510, PT_MIN=390, FT_PAID=8, PT_PAID=6.5;
+const SHIFTC={"AM-FT":{bg:"#dbeafe",fg:"#1e40af",label:"AM Full-time"},"MID-FT":{bg:"#dcfce7",fg:"#166534",label:"Mid Full-time"},"PM-FT":{bg:"#ffedd5",fg:"#9a3412",label:"PM Full-time"},"AM-PT":{bg:"#e0e7ff",fg:"#3730a3",label:"AM Part-time"},"MID-PT":{bg:"#fef9c3",fg:"#854d0e",label:"Mid Part-time"},"PM-PT":{bg:"#fce7f3",fg:"#9d174d",label:"PM Part-time"}};
+function shiftColor2(t){return SHIFTC[t]||{bg:"#f3f4f6",fg:"#111827",label:t}}
+function renderLegend(){legendEl.innerHTML=[["AM","Morning"],["MID","Evening"],["PM","Night"]].map(([k,l])=>`<span><span class="sw" style="background:${KINDGRAD[k]}"></span><b>${l}</b></span>`).join("")}
+function uid(){return Math.random().toString(36).slice(2,9)}
+function monday(d){let x=new Date(d);x.setHours(0,0,0,0);let dwd=(x.getDay()+6)%7;x.setDate(x.getDate()-dwd);return x}
+function iso(d){return d.toISOString().slice(0,10)}
+function parseISO(s){let[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)}
+function weekDays(){return [...Array(7)].map((_,i)=>{let d=parseISO(S.weekStart);d.setDate(d.getDate()+i);return d})}
+function key(day,shiftId){return day+"__"+shiftId}
+function getSlot(day,shiftId){return S.assign[key(day,shiftId)]||[]}
+function setSlot(day,shiftId,arr){S.assign[key(day,shiftId)]=arr;save();renderGrid();renderIssues()}
+function tstr(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
+function setCustom(day,shiftId,sv,ev){
+  if(!sv||!ev)return;
+  let p=sv.split(":"),q=ev.split(":");
+  S.times[key(day,shiftId)]={s:(+p[0])*60+(+p[1]),e:(+q[0])*60+(+q[1])};
+  save();renderGrid();renderNeeds();
+}
+function copyShiftTimesToAll(fromDay){
+  for(let sh of S.shifts){
+    let r=shiftRange(sh,fromDay);
+    if(!r)continue;
+    for(let d=0;d<7;d++){
+      if(d===fromDay)continue;
+      if(S.hours[d].closed){delete S.times[key(d,sh.id)];continue}
+      S.times[key(d,sh.id)]={s:r.s,e:r.e};
+    }
+  }
+  save();renderGrid();renderNeeds();renderHours();
+}
+function staffById(id){return S.staff.find(s=>s.id===id)}
+function roleColor(r){let i=S.roles.indexOf(r);return COLORS[(i<0?0:i)%COLORS.length]}
+function toMin(t){let[h,m]=t.split(":").map(Number);return h*60+m}
+function fmt(m){m=((m%1440)+1440)%1440;let h=Math.floor(m/60),mm=m%60,ap=h>=12?"p":"a",h12=h%12||12;return mm?h12+":"+String(mm).padStart(2,"0")+ap:h12+ap}
+function shiftRange(sh,day){
+  let ov=S.times[key(day,sh.id)];
+  if(ov)return {s:ov.s,e:ov.e,label:fmt(ov.s)+"–"+fmt(ov.e),custom:true};
+  let H=S.hours[day];
+  if(!H||H.closed)return null;
+  let o=toMin(H.open),c=toMin(H.close);
+  if(c<=o)return null;
+  let len=sh.emp==="FT"?FT_MIN:PT_MIN;
+  let s,e;
+  if(len>=c-o){s=o;e=c}
+  else if(sh.kind==="AM"){s=o;e=o+len}
+  else if(sh.kind==="PM"){s=c-len;e=c}
+  else{let mid=(o+c)/2;s=Math.round(mid-len/2);e=s+len}
+  return {s,e,label:fmt(s)+"–"+fmt(e),custom:false};
+}
+function shiftNeedTotal(sh){return S.roles.reduce((a,r)=>a+(sh.need[r]||0),0)}
+function needSummary(sh){let p=S.roles.map(r=>(sh.need[r]||0)+" "+r.slice(0,3)).join(" · ");return "Need "+(p||"0")}
+function defaults(){
+  if(!S.weekStart)S.weekStart=iso(monday(new Date()));
+  if(!S.opt)S.opt={floatPT:false,floatN:1,view:"matrix",mgrCovers:true};
+  if(!S.opt.view)S.opt.view="person";
+  if(!S.roles||!S.roles.length)S.roles=["Manager","Lead","Budtender"];
+  if(!S.hours||!S.hours.length)S.hours=DAYS.map((_,i)=>({open:"09:00",close:"21:00",closed:i===6?false:false}));
+  if(!S.shifts.length){
+    let mk=(tkey,kind,emp,need)=>({id:uid(),tkey,kind,emp,need});
+    S.shifts=[
+      mk("AM-FT","AM","FT",{Manager:0,Lead:0,Budtender:1}),
+      mk("MID-FT","MID","FT",{Manager:0,Lead:1,Budtender:0}),
+      mk("PM-FT","PM","FT",{Manager:0,Lead:0,Budtender:1}),
+      mk("AM-PT","AM","PT",{Manager:0,Lead:1,Budtender:0}),
+      mk("MID-PT","MID","PT",{Manager:0,Lead:0,Budtender:1}),
+      mk("PM-PT","PM","PT",{Manager:0,Lead:0,Budtender:1})
+    ];
+  }
+  if(!S.staff.length)S.staff=[
+    {id:uid(),name:"Snoop Dogg",role:"Manager",emp:"FT",max:40,off:[],manual:true},
+    {id:uid(),name:"Willie Nelson",role:"Manager",emp:"FT",max:40,off:[6],manual:true},
+    {id:uid(),name:"Bob Marley",role:"Lead",emp:"FT",max:40,off:[]},
+    {id:uid(),name:"Seth Rogen",role:"Lead",emp:"FT",max:40,off:[5]},
+    {id:uid(),name:"Wiz Khalifa",role:"Lead",emp:"FT",max:40,off:[6]},
+    {id:uid(),name:"Rihanna",role:"Budtender",emp:"FT",max:40,off:[]},
+    {id:uid(),name:"Miley Cyrus",role:"Budtender",emp:"FT",max:40,off:[]},
+    {id:uid(),name:"Cheech Marin",role:"Budtender",emp:"FT",max:40,off:[6]},
+    {id:uid(),name:"Tommy Chong",role:"Budtender",emp:"FT",max:40,off:[]},
+    {id:uid(),name:"ASAP Rocky",role:"Budtender",emp:"FT",max:40,off:[5]},
+    {id:uid(),name:"Woody Harrelson",role:"Budtender",emp:"FT",max:40,off:[]},
+    {id:uid(),name:"Lady Gaga",role:"Budtender",emp:"PT",max:28,off:[]},
+    {id:uid(),name:"Dave Chappelle",role:"Budtender",emp:"PT",max:28,off:[6]}
+  ];
+}
+async function save(){try{localStorage.setItem("sched-v1",JSON.stringify(S))}catch(e){}try{await root.kv.schedule.set("v1",S)}catch(e){}}
+async function load(){
+  let raw=null,kv=null;
+  try{raw=localStorage.getItem("sched-v1")}catch(e){}
+  try{kv=await root.kv.schedule.get("v1")}catch(e){}
+  let old=kv||(raw?JSON.parse(raw):null);
+  if(old&&old.staff){
+    if(old.shifts&&old.shifts.length&&old.shifts[0].tkey){
+      S=Object.assign(S,old);
+    } else {
+      let keep=old.staff.map(s=>({id:s.id||uid(),name:s.name||"New",role:s.role==="Manager"?"Manager":s.role==="Lead"?"Lead":"Worker",emp:"FT",max:s.max||5,off:s.off||[]}));
+      S={v:2,staff:keep,shifts:[],roles:[],hours:[],assign:{},weekStart:old.weekStart||null};
+      let extra=[...new Set(keep.map(s=>s.role).filter(Boolean))];
+      defaults();
+      extra.forEach(r=>{if(!S.roles.includes(r))S.roles.push(r)});
+    }
+  } else defaults();
+  if(!S.weekStart)S.weekStart=iso(monday(new Date()));
+  if(!S.times)S.times={};
+  if(!S.manual)S.manual={};
+  if(!S.events)S.events=[];
+  if(!S.opt)S.opt={floatPT:false,floatN:1,view:"person"};
+  if(!S.opt.view)S.opt.view="person";
+  if(S.opt.mgrCovers==null)S.opt.mgrCovers=true;
+  if(!S.v||S.v<3){
+    S.roles=S.roles.map(r=>r==="Worker"?"Budtender":r);
+    S.staff.forEach(s=>{s.max=(s.max||5)*8;if(s.role==="Worker")s.role="Budtender"});
+    S.shifts.forEach(sh=>{if(sh.need&&sh.need.Worker!=null){sh.need.Budtender=sh.need.Worker;delete sh.need.Worker}});
+    S.v=3;
+  }
+  S.staff.forEach(s=>{if(!S.roles.includes(s.role))s.role="Budtender";if(s.emp!=="FT"&&s.emp!=="PT")s.emp="FT"});
+  if(!S.v||S.v<4){S.opt.view="matrix";S.v=4}
+  if(!S.v||S.v<5){
+    S.staff.forEach(s=>{if(s.role==="Manager")s.manual=true});
+    S.shifts.forEach(sh=>{if(sh.need&&"Manager" in sh.need)sh.need.Manager=0});
+    S.v=5;
+  }
+  weekInput.value=S.weekStart;
+}
+function addStaff(){S.staff.push({id:uid(),name:"New",role:S.roles.includes("Budtender")?"Budtender":S.roles[0],emp:"PT",max:28,off:[]});save();renderStaff();renderGrid();renderIssues()}
+function delStaff(id){S.staff=S.staff.filter(s=>s.id!==id);for(let k in S.assign)S.assign[k]=S.assign[k].filter(x=>x!==id);save();renderAll()}
+function addRole(){let v=newRoleInput.value.trim();if(!v)return;if(S.roles.includes(v))return;S.roles.push(v);S.shifts.forEach(sh=>sh.need[v]=0);newRoleInput.value="";save();renderAll()}
+function delRole(r){if(!confirm("Remove role "+r+"? Staff with it become "+S.roles[0]+"."))return;S.roles=S.roles.filter(x=>x!==r);S.shifts.forEach(sh=>delete sh.need[r]);S.staff.forEach(s=>{if(s.role===r)s.role=S.roles[0]||"Worker"});save();renderAll()}
+function copyMonToAll(){for(let i=1;i<7;i++)S.hours[i]={...S.hours[0]};save();renderHours();renderGrid();renderNeeds()}
+function clearWeek(){if(!confirm("Clear all assignments this week?"))return;S.assign={};save();renderGrid();renderIssues()}
+function shiftWeek(n){let d=parseISO(S.weekStart);d.setDate(d.getDate()+n*7);S.weekStart=iso(d);weekInput.value=S.weekStart;S.assign={};save();renderAll()}
+function thisWeek(){S.weekStart=iso(monday(new Date()));weekInput.value=S.weekStart;S.assign={};save();renderAll()}
+function renderLocBadge(){let el=document.querySelector("#locBadge");if(!el)return;let st=(S.opt&&S.opt.state)||"",ct=(S.opt&&S.opt.city)||"";let t=[st,ct].filter(Boolean).join(" · ");el.textContent=t;el.style.display=t?"":"none"}
+function renderAll(){renderLocBadge();renderHours();renderManagers();renderNeeds();renderStaff();renderGrid();renderEvents();renderIssues();floatChk.checked=!!(S.opt&&S.opt.floatPT);floatN.value=(S.opt&&S.opt.floatN)||1;mgrCovChk.checked=!!(S.opt&&S.opt.mgrCovers);let wd=weekDays();weekLabelEl.textContent=wd[0].toLocaleDateString()+" – "+wd[6].toLocaleDateString()}
+let hoursOpen=new Set();
+function renderHours(){
+  hoursEl.innerHTML="";
+  S.hours.forEach((H,i)=>{
+    let wrap=document.createElement("div");wrap.style.cssText="padding:6px 0;border-bottom:1px solid #f3f4f6";
+    let d=document.createElement("div");d.className="hoursRow";d.style.borderBottom="none";d.style.padding="0";
+    let len=H.closed?"closed":((toMin(H.close)-toMin(H.open))/60).toFixed(1)+"h";
+    d.innerHTML=`<b>${DAYS[i]}</b><label>Open <input type="time" data-f="open" value="${H.open}"></label><label>Close <input type="time" data-f="close" value="${H.close}"></label><label><input type="checkbox" data-f="closed" ${H.closed?"checked":""}> Closed</label><span class="muted">${len}</span>`;
+    d.querySelector('[data-f=open]').onchange=e=>{H.open=e.target.value;H.closed=false;save();renderHours();renderGrid();renderNeeds()};
+    d.querySelector('[data-f=close]').onchange=e=>{H.close=e.target.value;H.closed=false;save();renderHours();renderGrid();renderNeeds()};
+    d.querySelector('[data-f=closed]').onchange=e=>{H.closed=e.target.checked;save();renderHours();renderGrid();renderIssues()};
+    wrap.appendChild(d);
+    let det=document.createElement("details");det.style.margin="4px 0 2px 52px";det.open=hoursOpen.has(i);
+    det.ontoggle=()=>{det.open?hoursOpen.add(i):hoursOpen.delete(i)};
+    let sum=document.createElement("summary");sum.style.fontSize="13px";sum.innerHTML=`<span class="muted">Shift times for ${DAYS[i]}</span>`;
+    det.appendChild(sum);
+    if(H.closed){let c=document.createElement("div");c.className="muted";c.textContent="Closed — no shifts.";det.appendChild(c)}
+    else{
+    let cp=document.createElement("button");cp.className="ghost small";cp.style.margin="4px 0";cp.textContent=`Copy ${DAYS[i]} times to all days`;
+    cp.onclick=()=>copyShiftTimesToAll(i);
+    det.appendChild(cp);
+    S.shifts.forEach(sh=>{
+      let r=shiftRange(sh,i);
+      let row=document.createElement("div");row.className="row";row.style.cssText="gap:6px;margin:4px 0;font-size:13px";
+      row.innerHTML=`<b style="width:64px">${sh.tkey}</b><span class="muted" style="width:36px">${sh.emp==="FT"?"8.5h":"6.5h"}</span><input type="time" data-s value="${r?tstr(r.s):""}"><span class="muted">–</span><input type="time" data-e value="${r?tstr(r.e):""}">${r&&r.custom?`<button class="ghost small" data-a>Auto</button><span class="muted">custom</span>`:""}`;
+      row.querySelector("[data-s]").onchange=e=>{setCustom(i,sh.id,e.target.value,row.querySelector("[data-e]").value);renderHours()};
+      row.querySelector("[data-e]").onchange=e=>{setCustom(i,sh.id,row.querySelector("[data-s]").value,e.target.value);renderHours()};
+      let ab=row.querySelector("[data-a]");if(ab)ab.onclick=()=>{delete S.times[key(i,sh.id)];save();renderGrid();renderNeeds();renderHours()};
+      det.appendChild(row);
+    });
+    }
+    wrap.appendChild(det);
+    hoursEl.appendChild(wrap);
+  });
+}
+function renderNeeds(){
+  rolesEl.innerHTML=S.roles.map(r=>`<span class="pill" style="background:${roleColor(r)}">${r} <a href="#" data-r="${r}" style="color:#fff;text-decoration:none" title="remove">✕</a></span>`).join("");
+  rolesEl.querySelectorAll("a").forEach(a=>a.onclick=e=>{e.preventDefault();delRole(a.dataset.r)});
+  let t=needsTable;t.innerHTML="";
+  let hr=document.createElement("tr");hr.innerHTML="<th>Shift</th>"+S.roles.filter(r=>r!=="Manager").map(r=>`<th>${r}</th>`).join("")+"<th>Total</th><th>Example (Mon)</th>";
+  t.appendChild(hr);
+  S.shifts.forEach(sh=>{
+    let tr=document.createElement("tr");
+    let ex=shiftRange(sh,0);
+    tr.innerHTML=`<td><b>${sh.tkey}</b><br><span class="muted">${sh.emp==="FT"?"8.5h (8 paid)":"6.5h"}</span></td>`+
+      S.roles.filter(r=>r!=="Manager").map(r=>`<td><input type="number" min="0" max="20" data-r="${r}" value="${sh.need[r]||0}"></td>`).join("")+
+      `<td><b>${shiftNeedTotal(sh)}</b></td><td class="muted">${ex?ex.label:"closed"}</td>`;
+    tr.querySelectorAll("input").forEach(inp=>inp.onchange=()=>{sh.need[inp.dataset.r]=Math.max(0,parseInt(inp.value||"0"));save();renderNeeds();renderGrid();renderIssues()});
+    t.appendChild(tr);
+  });
+}
+function renderStaff(){
+  staffCountEl.textContent=S.staff.length;navStaffCount.textContent="("+S.staff.length+")";
+  staffListEl.innerHTML="";
+  S.staff.forEach(st=>{
+    let d=document.createElement("div");d.className="staffItem";
+    d.innerHTML=`<input type="text" data-f="name" placeholder="Name" style="width:110px">`+
+    `<select data-f="role">${S.roles.map(r=>`<option ${r===st.role?"selected":""}>${r}</option>`).join("")}</select>`+
+    `<select data-f="emp"><option ${st.emp==="FT"?"selected":""}>FT</option><option ${st.emp==="PT"?"selected":""}>PT</option></select>`+
+    `<label class="muted" title="Set times by hand — skipped by auto-generate"><input type="checkbox" data-f="man" ${st.manual?"checked":""}> Manual</label>`+
+    `<label class="muted">Max hrs/wk <input type="number" min="0" max="80" data-f="max" style="width:56px"></label>`+
+    `<span class="dayoff">${DAYS.map((dn,i)=>`<label><input type="checkbox" data-off="${i}" ${st.off.includes(i)?"checked":""}> ${dn}</label>`).join("")}</span>`+
+    `<button class="ghost small inv" data-del="1">✕</button>`;
+    d.querySelector('[data-f=name]').value=st.name;
+    d.querySelector('[data-f=max]').value=st.max;
+    d.querySelector('[data-f=name]').oninput=e=>{st.name=e.target.value;save();renderGrid()};
+    d.querySelector('[data-f=role]').onchange=e=>{st.role=e.target.value;save();renderGrid();renderIssues()};
+    d.querySelector('[data-f=emp]').onchange=e=>{st.emp=e.target.value;save();renderGrid();renderIssues()};
+    d.querySelector('[data-f=man]').onchange=e=>{st.manual=e.target.checked;if(!st.manual)for(let d=0;d<7;d++)delete S.manual[d+"__"+st.id];save();renderGrid();renderIssues()};
+    d.querySelector('[data-f=max]').oninput=e=>{st.max=Math.max(0,parseInt(e.target.value||"0"));save();renderIssues()};
+    d.querySelectorAll('[data-off]').forEach(c=>c.onchange=()=>{let i=+c.dataset.off;st.off=c.checked?[...new Set([...st.off,i])]:st.off.filter(x=>x!==i);save();renderIssues()});
+    d.querySelector('[data-del]').onclick=()=>delStaff(st.id);
+    staffListEl.appendChild(d);
+  });
+}
+function counts(){let m={};S.staff.forEach(s=>m[s.id]=0);for(let k in S.assign)S.assign[k].forEach(id=>{if(m[id]!=null)m[id]++});return m}
+function paidHours(st){let h=0;for(let k in S.assign){if(!S.assign[k].includes(st.id))continue;let sh=S.shifts.find(x=>k.endsWith("__"+x.id));if(sh)h+=sh.emp==="FT"?FT_PAID:PT_PAID}for(let d=0;d<7;d++){let m=S.manual[d+"__"+st.id];if(m){let len=m.e-m.s;h+=len/60-(len>=480?0.5:0)}}return Math.round(h*2)/2}
+function assignedToday(day,id){return S.shifts.some(sh=>getSlot(day,sh.id).includes(id))||!!S.manual[day+"__"+id]}
+function manualCover(day,sh,role){
+  let r=shiftRange(sh,day);
+  if(!r)return [];
+  return S.staff.filter(s=>s.manual&&s.role===role&&!s.off.includes(day)&&(m=>m&&m.s<r.e&&r.s<m.e)(S.manual[day+"__"+s.id]));
+}
+function managerOnDuty(day,sh){
+  let r=shiftRange(sh,day);
+  if(!r)return [];
+  return S.staff.filter(s=>s.manual&&s.role==="Manager"&&!s.off.includes(day)&&(m=>m&&m.s<r.e&&r.s<m.e)(S.manual[day+"__"+s.id]));
+}
+function renderDayGrid(){
+  let wd=weekDays();let t=schedTable;t.innerHTML="";
+  let hr=document.createElement("tr");hr.innerHTML="<th></th>"+wd.map((d,i)=>`<th>${DAYS[i]}<br><span class="muted">${d.getMonth()+1}/${d.getDate()} · ${S.hours[i].closed?"closed":S.hours[i].open+"–"+S.hours[i].close}</span></th>`).join("");
+  t.appendChild(hr);
+  S.shifts.forEach(sh=>{
+    let tr=document.createElement("tr");
+    let th=document.createElement("th");th.innerHTML=`<span class="pill" style="background:${sh.emp==="FT"?"#111827":"#6b7280"}">${sh.tkey}</span><div class="shiftTime">${needSummary(sh)}</div>`;
+    tr.appendChild(th);
+    for(let d=0;d<7;d++){
+      let td=document.createElement("td");
+      let r=shiftRange(sh,d);
+      if(!r){td.innerHTML=`<span class="empty">Closed</span>`;tr.appendChild(td);continue}
+      let ids=getSlot(d,sh.id);
+      let need=shiftNeedTotal(sh);
+      let box=document.createElement("div");box.className="slot";
+      let pills=ids.map(id=>{let st=staffById(id);if(!st)return"";return `<span class="pill" style="background:${roleColor(st.role)}" title="${st.role} · ${st.emp}">${st.name}</span>`}).join("");
+      box.innerHTML=`<div class="shiftTime"${r.custom?' title="custom time"':""}>${r.label}${r.custom?" *":""}</div><div>${pills||`<span class="empty">+ assign (${need} needed)</span>`}</div><div class="muted">${ids.length}/${need}</div>`;
+      if(ids.length<need){box.style.outline="2px dashed #fca5a5";box.style.outlineOffset="-2px"}
+      box.onclick=()=>openPicker(d,sh.id);
+      td.appendChild(box);tr.appendChild(td);
+    }
+    t.appendChild(tr);
+  });
+}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderGrid(){
+  schedTable.hidden=false;
+  personListEl.hidden=true;
+  renderMatrix();
+  renderLegend();
+}
+function renderMatrix(){
+  let wd=weekDays();let t=schedTable;t.innerHTML="";
+  let hr=document.createElement("tr");
+  hr.innerHTML="<th></th>"+wd.map((d,i)=>`<th>${DAYS[i]}<br><span class="muted">${d.getMonth()+1}/${d.getDate()}</span></th>`).join("");
+  t.appendChild(hr);
+  let sorted=[...S.staff].sort((a,b)=>(S.roles.indexOf(a.role)-S.roles.indexOf(b.role))||a.name.localeCompare(b.name));
+  sorted.forEach(st=>{
+    let tr=document.createElement("tr");
+    let th=document.createElement("th");
+    th.innerHTML=`<span class="dot" style="background:${roleColor(st.role)}"></span> ${esc(st.name)}<br><span class="tag">${esc(st.role)} · ${st.emp}</span> <span class="muted">${paidHours(st)}/${st.max}h</span>${st.manual?` <span class="muted">manual</span>`:""}`;
+    th.onmouseenter=e=>showTip(st,e.clientX,e.clientY);th.onmousemove=e=>moveTip(e.clientX,e.clientY);th.onmouseleave=hideTip;
+    th.dataset.sid=st.id;
+    tr.appendChild(th);
+    for(let d=0;d<7;d++){
+      let td=document.createElement("td");
+      if(st.off.includes(d)){td.innerHTML=`<span class="empty">OFF</span>`;td.style.cursor="pointer";td.title="Add manual time";td.onclick=()=>openManual(d,st.id);tr.appendChild(td);continue}
+      if(st.manual){
+        let mm=S.manual[d+"__"+st.id];
+        if(mm){let mb=document.createElement("div");mb.className="tblock";mb.style.background="linear-gradient(180deg,#4b5563,#1f2937)";mb.style.color="#fff";mb.innerHTML=`<div class="tt">${fmt(mm.s)}</div><div class="ttsep"></div><div class="tt">${fmt(mm.e)}</div>`;td.appendChild(mb)}
+        else td.innerHTML=`<span class="empty">—</span>`;
+        td.style.cursor="pointer";td.title="Set times for "+st.name;
+        td.onclick=()=>openManual(d,st.id);
+        tr.appendChild(td);continue;
+      }
+      let slots=[];
+      S.shifts.forEach(sh=>{if(getSlot(d,sh.id).includes(st.id))slots.push({sh,r:shiftRange(sh,d)})});
+      let mn=S.manual[d+"__"+st.id];if(mn)slots.push({sh:null,r:{s:mn.s,e:mn.e,label:fmt(mn.s)+"–"+fmt(mn.e)},man:true});
+      slots.sort((a,b)=>(a.r?a.r.s:0)-(b.r?b.r.s:0));
+      if(!slots.length)td.innerHTML=`<span class="empty">—</span>`;
+      else slots.forEach(s=>{
+        let chip=document.createElement("div");chip.className="tblock";chip.draggable=true;chip.style.userSelect="none";
+        chip.ondragstart=e=>{e.dataTransfer.setData("text/plain",JSON.stringify(s.man?{man:true,day:d,id:st.id}:{id:st.id,day:d,sh:s.sh.id}));e.dataTransfer.effectAllowed="move"};
+        chip.ondragover=e=>{e.preventDefault();chip.classList.add("dropHi")};
+        chip.ondragleave=()=>chip.classList.remove("dropHi");
+        chip.ondrop=e=>{e.preventDefault();chip.classList.remove("dropHi");dropOnChip(e,s.man?{man:true,day:d,id:st.id}:{id:st.id,day:d,sh:s.sh.id})};
+        if(s.man){
+          chip.title="Manual — drag to swap, click to edit";
+          chip.style.background="linear-gradient(180deg,#4b5563,#1f2937)";chip.style.color="#fff";
+          chip.innerHTML=`<div class="tt">${esc(fmt(s.r.s))}</div><div class="ttsep"></div><div class="tt">${esc(fmt(s.r.e))}</div>`;
+          chip.onclick=()=>openManual(d,st.id);
+        }else{
+          chip.title=(KINDNAME[s.sh.kind]||s.sh.tkey)+" — drag to swap, click to edit";
+          chip.style.background=KINDGRAD[s.sh.kind]||"#333";chip.style.color="#fff";chip.style.borderColor="rgba(255,255,255,.35)";
+          chip.innerHTML=`<div class="tt">${s.r?esc(fmt(s.r.s)):""}</div><div class="ttsep"></div><div class="tt">${s.r?esc(fmt(s.r.e))+(s.r.custom?" *":""):""}</div>`;
+          chip.onclick=()=>openPicker(d,s.sh.id);
+        }
+        td.appendChild(chip);
+      });
+      tr.appendChild(td);
+    }
+    t.appendChild(tr);
+  });
+}
+function renderPerson(){
+  let wd=weekDays();personListEl.innerHTML="";
+  let psorted=[...S.staff].sort((a,b)=>(S.roles.indexOf(a.role)-S.roles.indexOf(b.role))||a.name.localeCompare(b.name));
+  psorted.forEach(st=>{
+    let card=document.createElement("div");card.className="person";
+    let slots=[];
+    for(let d=0;d<7;d++)for(let sh of S.shifts){
+      if(!getSlot(d,sh.id).includes(st.id))continue;
+      slots.push({d,sh,r:shiftRange(sh,d)});
+    }
+    for(let d=0;d<7;d++){let m=S.manual[d+"__"+st.id];if(m)slots.push({d,sh:null,r:{s:m.s,e:m.e,label:fmt(m.s)+"–"+fmt(m.e)},man:true})}
+    slots.sort((a,b)=>a.d-b.d||(a.r?a.r.s:0)-(b.r?b.r.s:0));
+    let h=paidHours(st);
+    let offTxt=st.off.length?` · Off ${st.off.slice().sort().map(i=>DAYS[i]).join(", ")}`:"";
+    card.innerHTML=`<div class="personHead"><span class="dot" style="background:${roleColor(st.role)}"></span><b>${esc(st.name)}</b><span class="tag">${esc(st.role)} · ${st.emp}</span><span class="muted">${slots.length} shifts · ${h}/${st.max} hrs${esc(offTxt)}</span></div>`;
+    if(!slots.length){let o=document.createElement("div");o.className="muted";o.style.padding="4px 0 2px 22px";o.textContent="Off this week";card.appendChild(o)}
+    else{
+      let list=document.createElement("div");list.className="shifts";
+      slots.forEach(s=>{
+        let row=document.createElement("div");row.className="shiftRow";
+        row.innerHTML=`<span class="d">${DAYS[s.d]} <span class="muted">${wd[s.d].getMonth()+1}/${wd[s.d].getDate()}</span></span>${s.man?`<span class="pill" style="background:${roleColor(st.role)}">Manual</span>`:`<span class="pill" style="background:${s.sh.emp==="FT"?"#111827":"#6b7280"}">${esc(s.sh.tkey)}</span>`}<span class="t">${s.r?esc(s.r.label)+(s.r.custom?" *":""):""}</span>`;
+        row.style.cursor="pointer";row.title="Edit";
+        row.onclick=()=>{s.man?openManual(s.d,st.id):openPicker(s.d,s.sh.id)};
+        list.appendChild(row);
+      });
+      card.appendChild(list);
+    }
+    personListEl.appendChild(card);
+  });
+  if(!S.staff.length)personListEl.innerHTML='<span class="muted">No staff yet.</span>';
+}
+function addEvent(){let t=eventTextInput.value.trim();if(!t)return;S.events.push({id:uid(),day:+eventDaySel.value||0,text:t,st:"Scheduled"});eventTextInput.value="";save();renderEvents()}
+function delEvent(id){S.events=S.events.filter(e=>e.id!==id);save();renderEvents()}
+function cycleEvent(id){let e=(S.events||[]).find(x=>x.id===id);if(!e)return;e.st=e.st==="Scheduled"?"Completed":e.st==="Completed"?"Pending":"Scheduled";save();renderEvents()}
+function renderEvents(){
+  if(!eventDaySel.options.length)eventDaySel.innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join("");
+  eventListEl.innerHTML="";
+  let evs=[...(S.events||[])].sort((a,b)=>a.day-b.day);
+  if(!evs.length){eventListEl.innerHTML='<span class="muted">No events yet.</span>';return}
+  evs.forEach(e=>{
+    if(!e.st)e.st="Scheduled";
+    let d=document.createElement("div");d.className="staffItem";
+    d.innerHTML=`<span class="evday">${DAYS[e.day]}</span><span style="flex:1">${esc(e.text)}</span><span class="evst" data-st="${e.st}" title="Change status">${e.st}</span><button class="ghost small" data-del="1">✕</button>`;
+    d.querySelector("[data-del]").onclick=()=>delEvent(e.id);
+    d.querySelector(".evst").onclick=()=>cycleEvent(e.id);
+    eventListEl.appendChild(d);
+  });
+}
+function goModule(i,scroll){let mods=[...document.querySelectorAll(".maincol details.card")];mods.forEach((m,j)=>{m.classList.toggle("mactive",j===i);m.open=j===i});if(scroll!==false&&mods[i])mods[i].scrollIntoView({behavior:"smooth",block:"start"});document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.m==i))}
+function goEvents(){document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.m==="ev"));document.querySelector("#eventListEl").closest(".card").scrollIntoView({behavior:"smooth",block:"start"})}
+function staffTipHTML(st){
+  let h=paidHours(st);
+  let slots=[];
+  for(let d=0;d<7;d++){
+    S.shifts.forEach(sh=>{if(getSlot(d,sh.id).includes(st.id)){let r=shiftRange(sh,d);slots.push(DAYS[d]+" "+(r?r.label:""))}});
+    let m=S.manual[d+"__"+st.id];if(m)slots.push(DAYS[d]+" "+fmt(m.s)+"–"+fmt(m.e));
+  }
+  return `<div class="tipname">${esc(st.name)}</div><div class="muted">${esc(st.role)} · ${st.emp}</div><div class="tiprow"><span>Hours</span><b>${h}/${st.max}</b></div><div class="tipsec">Working</div><div class="tipdays">${slots.join("<br>")||"None scheduled"}</div><div class="tipsec">Requested off</div><div class="tipdays">${st.off.length?st.off.slice().sort().map(i=>DAYS[i]).join(", "):"None"}</div>`;
+}
+let tipEl=null;
+function tip(){if(!tipEl){tipEl=document.createElement("div");tipEl.id="tipEl";tipEl.hidden=true;document.body.appendChild(tipEl)}return tipEl}
+function showTip(st,x,y){let t=tip();t.innerHTML=staffTipHTML(st);t.hidden=false;moveTip(x,y)}
+function moveTip(x,y){let t=tip();let r=t.getBoundingClientRect();let nx=x+14,ny=y+14;if(nx+r.width>innerWidth-8)nx=x-r.width-14;if(ny+r.height>innerHeight-8)ny=y-r.height-14;t.style.left=nx+"px";t.style.top=ny+"px"}
+function hideTip(){if(tipEl)tipEl.hidden=true}
+function dropOnChip(e,tgt){
+  let src=null;try{src=JSON.parse(e.dataTransfer.getData("text/plain"))}catch(_){}
+  if(!src)return;
+  if(src.man&&tgt.man){
+    let a=src.day+"__"+src.id,b=tgt.day+"__"+tgt.id;
+    if(a===b)return;
+    let tmp=S.manual[a];if(S.manual[b])S.manual[a]=S.manual[b];else delete S.manual[a];if(tmp)S.manual[b]=tmp;
+    save();renderGrid();renderIssues();return;
+  }
+  if(!src.man&&!tgt.man){
+    if(src.id===tgt.id&&src.sh===tgt.sh&&src.day===tgt.day)return;
+    let A=getSlot(src.day,src.sh).filter(x=>x!==src.id);
+    let B=getSlot(tgt.day,tgt.sh).filter(x=>x!==tgt.id);
+    if(getSlot(src.day,src.sh).includes(src.id))A.push(tgt.id);
+    if(getSlot(tgt.day,tgt.sh).includes(tgt.id))B.push(src.id);
+    S.assign[key(src.day,src.sh)]=A;S.assign[key(tgt.day,tgt.sh)]=B;
+    save();renderGrid();renderIssues();
+  }
+}
+function moveShiftTo(src,newId,newDay){
+  S.assign[key(src.day,src.sh)]=getSlot(src.day,src.sh).filter(x=>x!==src.id);
+  let B=getSlot(newDay,src.sh);
+  if(!B.includes(newId))B.push(newId);
+  S.assign[key(newDay,src.sh)]=B;
+  save();renderGrid();renderIssues();
+}
+schedTable.ondragover=e=>{
+  let td=e.target.closest?e.target.closest("td"):null;
+  if(!td||td.cellIndex===0||(e.target.closest&&e.target.closest(".tblock")))return;
+  e.preventDefault();e.dataTransfer.dropEffect="move";
+  schedTable.querySelectorAll("td.dropHi").forEach(x=>{if(x!==td)x.classList.remove("dropHi")});
+  td.classList.add("dropHi");
+};
+schedTable.ondrop=e=>{
+  let td=e.target.closest?e.target.closest("td"):null;
+  if(!td||td.cellIndex===0||(e.target.closest&&e.target.closest(".tblock")))return;
+  e.preventDefault();
+  let src=null;try{src=JSON.parse(e.dataTransfer.getData("text/plain"))}catch(_){}
+  if(!src||src.man)return;
+  let sid=td.parentNode.cells[0].dataset.sid;
+  if(!sid)return;
+  moveShiftTo(src,sid,td.cellIndex-1);
+};
+document.addEventListener("dragend",()=>{let t=document.querySelector("#schedTable");if(t)t.querySelectorAll(".dropHi").forEach(x=>x.classList.remove("dropHi"))});
+function fatigueOpt(){let o=S.opt||{};return{restHrs:o.restHrs==null?11:Math.max(0,+o.restHrs||0),allowCloseOpen:!!o.allowCloseOpen,maxConsec:o.maxConsec==null?5:Math.max(1,+o.maxConsec||1),maxNights:o.maxNights==null?3:Math.max(1,+o.maxNights||1),minOff:o.minOff==null?1:Math.max(0,+o.minOff||0)}}
+function personShifts(id){
+let out=[];
+S.shifts.forEach(sh=>{for(let d=0;d<7;d++){if(!getSlot(d,sh.id).includes(id))continue;let r=shiftRange(sh,d);if(r)out.push({day:d,s:r.s,e:r.e,kind:sh.kind})}});
+for(let d=0;d<7;d++){let m=S.manual[d+"__"+id];if(m){let k=m.s<720?"AM":(m.e>=1200?"PM":"MID");out.push({day:d,s:m.s,e:m.e,kind:k})}}
+out.sort((a,b)=>(a.day*1440+a.s)-(b.day*1440+b.s));
+return out;
+}
+function fatigueIssuesFor(id){
+let F=fatigueOpt(),L=personShifts(id),out=[];
+for(let i=1;i<L.length;i++){
+let gap=(L[i].day*1440+L[i].s)-(L[i-1].day*1440+L[i-1].e);
+if(gap<F.restHrs*60)out.push(`only ${Math.round(gap/6)/10}h rest before ${DAYS[L[i].day]} ${fmt(L[i].s)} (min ${F.restHrs}h)`);
+if(!F.allowCloseOpen&&L[i-1].kind==="PM"&&L[i].kind==="AM"&&L[i].day===L[i-1].day+1)out.push(`close-to-open: ${DAYS[L[i-1].day]} night into ${DAYS[L[i].day]} morning`);
+}
+let days=[...new Set(L.map(x=>x.day))].sort((a,b)=>a-b);
+let run=1;for(let i=1;i<=days.length;i++){if(i<days.length&&days[i]===days[i-1]+1)run++;else{if(run>F.maxConsec)out.push(`${run} days in a row (max ${F.maxConsec})`);run=1}}
+let nd=days.filter(d=>L.some(x=>x.day===d&&x.kind==="PM"));
+run=1;for(let i=1;i<=nd.length;i++){if(i<nd.length&&nd[i]===nd[i-1]+1)run++;else{if(run>F.maxNights)out.push(`${run} nights in a row (max ${F.maxNights})`);run=1}}
+if(F.minOff>0&&7-days.length<F.minOff)out.push(`only ${7-days.length} day(s) off (min ${F.minOff})`);
+return out;
+}
+function shiftDesir(sh,d){let v=sh.kind==="AM"?1:(sh.kind==="PM"?-1:0);if(d>=5)v-=1;if(d===6)v-=0.5;return v}
+function fairBal(id){
+let p=0,n=0,H=S.fairHist||{};
+for(let wk in H){if(wk===S.weekStart)continue;let e=H[wk][id];if(e){p+=e.pts||0;n+=e.n||0}}
+personShifts(id).forEach(x=>{p+=shiftDesir({kind:x.kind},x.day);n++});
+return n?p/n:0;
+}
+function snapshotFairness(){
+if(!S.fairHist)S.fairHist={};
+let w={};
+S.staff.forEach(s=>{w[s.id]={pts:0,n:0,AM:0,MID:0,PM:0,WE:0}});
+S.staff.forEach(s=>{let e=w[s.id];if(!e)return;personShifts(s.id).forEach(x=>{e.n++;e.pts+=shiftDesir({kind:x.kind},x.day);if(x.kind==="AM"||x.kind==="MID"||x.kind==="PM")e[x.kind]++;if(x.day>=5)e.WE++})});
+S.fairHist[S.weekStart]=w;
+}
+function fairTotals(){
+let T={};
+S.staff.forEach(s=>{T[s.id]={pts:0,n:0,AM:0,MID:0,PM:0,WE:0}});
+let H=S.fairHist||{};
+for(let wk in H)for(let id in H[wk]){if(!T[id])continue;let e=H[wk][id],t=T[id];t.n+=e.n||0;t.pts+=e.pts||0;t.AM+=e.AM||0;t.MID+=e.MID||0;t.PM+=e.PM||0;t.WE+=e.WE||0}
+if(!H[S.weekStart])S.staff.forEach(s=>{let t=T[s.id];if(!t)return;personShifts(s.id).forEach(x=>{t.n++;t.pts+=shiftDesir({kind:x.kind},x.day);if(x.kind==="AM"||x.kind==="MID"||x.kind==="PM")t[x.kind]++;if(x.day>=5)t.WE++})});
+return T;
+}
+function fairnessFlags(){
+let T=fairTotals(),ids=Object.keys(T).filter(id=>T[id].n>0);
+if(!ids.length)return [];
+let avg=k=>ids.reduce((a,id)=>a+T[id][k],0)/ids.length;
+let aPM=avg("PM"),aWE=avg("WE"),aAM=avg("AM"),out=[];
+let r1=x=>Math.round(x*10)/10;
+ids.forEach(id=>{let s=staffById(id);if(!s)return;let t=T[id];
+if(t.PM>=4&&t.PM>=Math.max(2,aPM*2))out.push(`Fairness: ${s.name} has ${t.PM} nights (avg ${r1(aPM)})`);
+if(aWE>=1&&t.n>=4&&t.WE===0)out.push(`Fairness: ${s.name} has no weekend shifts (avg ${r1(aWE)})`);
+if(t.AM>=4&&t.AM>=Math.max(2,aAM*2))out.push(`Fairness: ${s.name} has ${t.AM} mornings (avg ${r1(aAM)})`);
+let dom=[["AM",t.AM],["MID",t.MID],["PM",t.PM]].sort((a,b)=>b[1]-a[1])[0];
+if(t.n>=5&&dom[1]/t.n>=0.75)out.push(`Fairness: ${s.name} is on ${dom[0]==="AM"?"mornings":dom[0]==="MID"?"mids":"nights"} for ${dom[1]}/${t.n} shifts`);
+});
+return out;
+}
+function fatigueScan(){let out=[];S.staff.forEach(s=>fatigueIssuesFor(s.id).forEach(t=>out.push(`Fatigue: ${s.name} — ${t}`)));return out}
+function renderIssues(){
+  let c=counts();let lines=[];
+  S.shifts.forEach(sh=>{for(let d=0;d<7;d++){
+    if(shiftRange(sh,d)===null){if(getSlot(d,sh.id).length)lines.push(`${DAYS[d]} ${sh.tkey}: assigned on closed day`);continue}
+    let ids=getSlot(d,sh.id);
+    let short=[];
+    S.roles.forEach(r=>{
+      let want=sh.need[r]||0;
+      let got=ids.map(staffById).filter(s=>s&&s.role===r).length;
+      got+=manualCover(d,sh,r).length;
+      if(got<want)short.push({r,got,want,missing:want-got});
+    });
+    if(S.opt.mgrCovers&&managerOnDuty(d,sh).length&&short.length){
+      short.sort((a,b)=>b.missing-a.missing);
+      if(short[0].missing>0)short[0].missing--;
+    }
+    short.filter(x=>x.missing>0).forEach(x=>lines.push(`Short: ${DAYS[d]} ${sh.tkey} ${x.r}: ${x.got}/${x.want} (manager covering 1)`));
+  }});
+  S.staff.filter(s=>paidHours(s)>s.max+1e-6).forEach(s=>lines.push(`${s.name} over max hours (${paidHours(s)}/${s.max})`));
+  S.staff.filter(s=>s.off.some(d=>S.shifts.some(sh=>getSlot(d,sh.id).includes(s.id))||S.manual[d+"__"+s.id])).forEach(s=>lines.push(`${s.name} scheduled on a day off`));
+  fatigueScan().forEach(t=>lines.push(t));
+  fairnessFlags().forEach(t=>lines.push(t));
+  let mix=[];for(let k in S.assign){let[day,shid]=k.split("__");let sh=S.shifts.find(x=>x.id===shid);if(!sh)continue;S.assign[k].forEach(id=>{let s=staffById(id);if(s&&s.emp!==sh.emp)mix.push(`${s.name} (${s.emp}) on ${DAYS[+day]} ${sh.tkey} (${sh.emp})`)})}
+  let el=issuesEl;
+  if(!lines.length&&!mix.length){el.innerHTML=`<div class="okline">Fully staffed, no conflicts.</div>`;return}
+  el.innerHTML=`<div class="warn">${lines.map(x=>"• "+x).join("<br>")}${mix.length?("<br><span class='muted'>FT/PT cross-cover: "+mix.slice(0,6).join("; ")+(mix.length>6?"…":"")+"</span>"):""}</div>`;
+}
+function openPicker(day,shiftId){
+  let sh=S.shifts.find(s=>s.id===shiftId);let cur=new Set(getSlot(day,shiftId));let c=counts();let r=shiftRange(sh,day);
+  let m=modalCtn;m.hidden=false;m.innerHTML="";
+  let box=document.createElement("div");box.className="modal";box.onclick=e=>{if(e.target===box)closeModal()};
+  let inner=document.createElement("div");inner.className="modalBox";
+  let prog=S.roles.filter(x=>x!=="Manager").map(x=>{let want=sh.need[x]||0,got=[...cur].map(staffById).filter(s=>s&&s.role===x).length;return `${x} ${got}/${want}`}).join(" · ");
+  let manTxt=[];S.roles.forEach(x=>manualCover(day,sh,x).forEach(s=>manTxt.push(s.name)));manTxt=manTxt.length?" · Manual here: "+manTxt.join(", "):"";
+  inner.innerHTML=`<div class="row" style="justify-content:space-between"><strong>${DAYS[day]} — ${sh.tkey}</strong><button class="ghost small" onclick="closeModal()">Close</button></div>
+  <div class="row" style="margin:6px 0"><label class="muted">Start <input type="time" id="ctStart" value="${r?tstr(r.s):""}"></label><label class="muted">End <input type="time" id="ctEnd" value="${r?tstr(r.e):""}"></label><button class="ghost small" id="ctAuto">Auto</button></div>
+  <div class="muted" id="progEl">${prog} · ${sh.emp==="FT"?"FT 8.5h (8 paid)":"PT 6.5h"}${r&&r.custom?" · custom time":""}${manTxt}</div>`;
+  inner.querySelector("#ctStart").onchange=e=>setCustom(day,shiftId,e.target.value,inner.querySelector("#ctEnd").value);
+  inner.querySelector("#ctEnd").onchange=e=>setCustom(day,shiftId,inner.querySelector("#ctStart").value,e.target.value);
+  inner.querySelector("#ctAuto").onclick=()=>{delete S.times[key(day,shiftId)];save();renderGrid();renderNeeds();closeModal();openPicker(day,shiftId)};
+  let sorted=[...S.staff].sort((a,b)=>{
+    let ar=a.role==null?9:S.roles.indexOf(a.role),br=b.role==null?9:S.roles.indexOf(b.role);
+    if((a.emp===sh.emp)!==(b.emp===sh.emp))return a.emp===sh.emp?-1:1;
+    return ar-br;
+  });
+  sorted.forEach(st=>{
+    let lab=document.createElement("label");lab.className="chk";
+    let isOff=st.off.includes(day);let hh=paidHours(st);
+    lab.innerHTML=`<input type="checkbox" ${cur.has(st.id)?"checked":""}> <b>${st.name}</b> <span class="muted">${st.role} · ${st.emp} · ${hh}/${st.max}h${isOff?" · OFF":""}</span>`;
+    lab.querySelector("input").onchange=e=>{
+      e.target.checked?cur.add(st.id):cur.delete(st.id);
+      setSlot(day,shiftId,[...cur]);
+      let p=S.roles.filter(x=>x!=="Manager").map(x=>{let want=sh.need[x]||0,got=[...cur].map(staffById).filter(s=>s&&s.role===x).length;return `${x} ${got}/${want}`}).join(" · ");
+      let pe=document.querySelector("#progEl");if(pe)pe.textContent=p+manTxt;
+    };
+    inner.appendChild(lab);
+  });
+  if(!S.staff.length)inner.innerHTML+=`<div class="muted">Add staff first.</div>`;
+  box.appendChild(inner);m.appendChild(box);
+}
+function closeModal(){modalCtn.hidden=true;modalCtn.innerHTML=""}
+const US_CITIES={"Alabama":["Birmingham","Montgomery","Mobile","Huntsville","Tuscaloosa"],"Alaska":["Anchorage","Fairbanks","Juneau","Wasilla","Sitka"],"Arizona":["Phoenix","Tucson","Mesa","Scottsdale","Flagstaff","Tempe"],"Arkansas":["Little Rock","Fayetteville","Fort Smith","Jonesboro","Conway"],"California":["Los Angeles","San Francisco","San Diego","Sacramento","San Jose","Oakland","Fresno"],"Colorado":["Denver","Boulder","Colorado Springs","Fort Collins","Aurora","Aspen"],"Connecticut":["Hartford","New Haven","Stamford","Bridgeport","New London"],"Delaware":["Wilmington","Dover","Newark","Rehoboth Beach","Lewes"],"District of Columbia":["Washington"],"Florida":["Miami","Orlando","Tampa","Jacksonville","Tallahassee","Fort Lauderdale"],"Georgia":["Atlanta","Savannah","Augusta","Athens","Macon","Columbus"],"Hawaii":["Honolulu","Hilo","Maui","Kauai","Kona"],"Idaho":["Boise","Idaho Falls","Meridian","Coeur d'Alene","Twin Falls"],"Illinois":["Chicago","Springfield","Peoria","Naperville","Rockford","Champaign"],"Indiana":["Indianapolis","Fort Wayne","Bloomington","Evansville","South Bend","Gary"],"Iowa":["Des Moines","Iowa City","Cedar Rapids","Davenport","Ames"],"Kansas":["Wichita","Kansas City","Topeka","Overland Park","Lawrence"],"Kentucky":["Louisville","Lexington","Bowling Green","Covington","Frankfort"],"Louisiana":["New Orleans","Baton Rouge","Shreveport","Lafayette","Lake Charles"],"Maine":["Portland","Augusta","Bangor","Bar Harbor","Lewiston"],"Maryland":["Baltimore","Annapolis","Frederick","Ocean City","Bethesda"],"Massachusetts":["Boston","Worcester","Springfield","Cambridge","Salem"],"Michigan":["Detroit","Grand Rapids","Ann Arbor","Lansing","Traverse City","Flint"],"Minnesota":["Minneapolis","St. Paul","Duluth","Rochester","Bloomington"],"Mississippi":["Jackson","Biloxi","Gulfport","Tupelo","Hattiesburg"],"Missouri":["St. Louis","Kansas City","Springfield","Columbia","Jefferson City","Branson"],"Montana":["Billings","Missoula","Bozeman","Helena","Great Falls"],"Nebraska":["Omaha","Lincoln","Bellevue","Grand Island","Kearney"],"Nevada":["Las Vegas","Reno","Henderson","Carson City","Sparks"],"New Hampshire":["Manchester","Concord","Nashua","Portsmouth","Dover"],"New Jersey":["Newark","Jersey City","Trenton","Atlantic City","Princeton","Hoboken"],"New Mexico":["Albuquerque","Santa Fe","Las Cruces","Taos","Roswell"],"New York":["New York City","Albany","Buffalo","Rochester","Syracuse","Yonkers"],"North Carolina":["Charlotte","Raleigh","Durham","Asheville","Wilmington","Greensboro"],"North Dakota":["Fargo","Bismarck","Grand Forks","Minot","Dickinson"],"Ohio":["Columbus","Cleveland","Cincinnati","Toledo","Akron","Dayton","Youngstown","Canton"],"Oklahoma":["Oklahoma City","Tulsa","Norman","Stillwater","Edmond"],"Oregon":["Portland","Salem","Eugene","Bend","Beaverton","Medford"],"Pennsylvania":["Philadelphia","Pittsburgh","Harrisburg","Erie","Allentown","State College"],"Rhode Island":["Providence","Newport","Warwick","Cranston","Pawtucket"],"South Carolina":["Columbia","Charleston","Greenville","Myrtle Beach","Spartanburg"],"South Dakota":["Sioux Falls","Rapid City","Pierre","Aberdeen","Brookings"],"Tennessee":["Nashville","Memphis","Knoxville","Chattanooga","Gatlinburg","Clarksville"],"Texas":["Houston","Austin","Dallas","San Antonio","Fort Worth","El Paso","Lubbock"],"Utah":["Salt Lake City","Provo","Ogden","Park City","St. George"],"Vermont":["Burlington","Montpelier","Rutland","Stowe","Brattleboro"],"Virginia":["Richmond","Virginia Beach","Arlington","Norfolk","Charlottesville","Roanoke"],"Washington":["Seattle","Spokane","Tacoma","Olympia","Bellevue","Bellingham"],"West Virginia":["Charleston","Morgantown","Huntington","Wheeling","Parkersburg"],"Wisconsin":["Milwaukee","Madison","Green Bay","Kenosha","Appleton"],"Wyoming":["Cheyenne","Jackson","Casper","Laramie","Cody"]};
+function openSettings(){
+let m=modalCtn;m.hidden=false;m.innerHTML="";
+let box=document.createElement("div");box.className="modal";box.onclick=e=>{if(e.target===box)closeModal()};
+let inner=document.createElement("div");inner.className="modalBox";
+let st=(S.opt&&S.opt.state)||"Ohio",ct=(S.opt&&S.opt.city)||"";
+inner.innerHTML='<div class="row" style="justify-content:space-between"><strong>Settings</strong><button class="ghost small" onclick="closeModal()">Close</button></div>'
++'<div style="margin-top:10px"><span class="muted">State</span><select id="setState" style="width:100%;margin-top:4px"></select></div>'
++'<div style="margin-top:8px"><span class="muted">City</span><input id="setCity" list="cityList" placeholder="Type a city…" style="width:100%;margin-top:4px"><datalist id="cityList"></datalist></div>'
++'<div style="margin-top:12px"><strong>Fatigue &amp; recovery</strong></div>'
++'<div class="row" style="margin-top:6px"><label class="muted">Min rest (hrs)<br><input id="setRest" type="number" min="0" max="24" step="0.5" style="width:80px"></label><label class="muted">Max days in a row<br><input id="setMaxD" type="number" min="1" max="7" style="width:80px"></label><label class="muted">Max nights in a row<br><input id="setMaxN" type="number" min="1" max="7" style="width:80px"></label><label class="muted">Min days off / week<br><input id="setMinOff" type="number" min="0" max="7" style="width:80px"></label></div>'
++'<label class="muted" style="display:block;margin-top:6px"><input type="checkbox" id="setCloseOpen"> Allow close-to-open (night into next morning)</label>'
++'<div class="row" style="margin-top:12px;justify-content:flex-end"><button class="small" onclick="saveSettings()">Save</button></div>';
+box.appendChild(inner);m.appendChild(box);
+let ss=inner.querySelector("#setState");
+Object.keys(US_CITIES).forEach(s=>{let o=document.createElement("option");o.value=s;o.textContent=s;if(s===st)o.selected=true;ss.appendChild(o)});
+let fill=()=>{let dl=inner.querySelector("#cityList");dl.innerHTML="";(US_CITIES[ss.value]||[]).forEach(c=>{let o=document.createElement("option");o.value=c;dl.appendChild(o)})};
+ss.onchange=()=>{fill()};
+fill();
+inner.querySelector("#setCity").value=ct;
+let F=fatigueOpt();
+inner.querySelector("#setRest").value=F.restHrs;
+inner.querySelector("#setMaxD").value=F.maxConsec;
+inner.querySelector("#setMaxN").value=F.maxNights;
+inner.querySelector("#setMinOff").value=F.minOff;
+inner.querySelector("#setCloseOpen").checked=F.allowCloseOpen;
+}
+function saveSettings(){S.opt=S.opt||{};S.opt.state=setState.value;S.opt.city=setCity.value;let r=parseFloat(setRest.value),md=parseInt(setMaxD.value),mn=parseInt(setMaxN.value),mo=parseInt(setMinOff.value);if(isNaN(r))delete S.opt.restHrs;else S.opt.restHrs=r;if(isNaN(md))delete S.opt.maxConsec;else S.opt.maxConsec=md;if(isNaN(mn))delete S.opt.maxNights;else S.opt.maxNights=mn;if(isNaN(mo))delete S.opt.minOff;else S.opt.minOff=mo;S.opt.allowCloseOpen=setCloseOpen.checked;save();renderLocBadge();closeModal()}
+window.closeModal=closeModal;
+function openManual(day,staffId){
+  let st=staffById(staffId);if(!st)return;
+  let k=day+"__"+staffId;let cur=S.manual[k];
+  let m=modalCtn;m.hidden=false;m.innerHTML="";
+  let box=document.createElement("div");box.className="modal";box.onclick=e=>{if(e.target===box)closeModal()};
+  let inner=document.createElement("div");inner.className="modalBox";
+  inner.innerHTML=`<div class="row" style="justify-content:space-between"><strong>${DAYS[day]} — ${st.name} (manual)</strong><button class="ghost small" onclick="closeModal()">Close</button></div>
+  <div class="row" style="margin:6px 0"><label class="muted">Start <input type="time" id="mnS" value="${cur?tstr(cur.s):""}"></label><label class="muted">End <input type="time" id="mnE" value="${cur?tstr(cur.e):""}"></label></div>
+  <div class="muted">Skipped by auto-generate. Paid hrs = time worked minus 30-min lunch on 8h+ days.</div>
+  <div class="row" style="margin-top:8px"><button id="mnSave">Save</button><button class="ghost" id="mnClear">Clear day</button></div>`;
+  inner.querySelector("#mnSave").onclick=()=>{
+    let sv=inner.querySelector("#mnS").value,ev=inner.querySelector("#mnE").value;
+    if(!sv||!ev)return;
+    let p=sv.split(":"),q=ev.split(":");
+    S.manual[k]={s:(+p[0])*60+(+p[1]),e:(+q[0])*60+(+q[1])};
+    save();renderGrid();renderIssues();closeModal();
+  };
+  inner.querySelector("#mnClear").onclick=()=>{delete S.manual[k];save();renderGrid();renderIssues();closeModal()};
+  box.appendChild(inner);m.appendChild(box);
+}
+function autoGenerate(){
+  if(!S.staff.length||!S.shifts.length)return;
+  S.assign={};let h={};S.staff.forEach(s=>h[s.id]=0);
+  S.shifts.forEach(sh=>{for(let d=0;d<7;d++)S.assign[key(d,sh.id)]=[]});
+  let pick=(d,sh,role,paid)=>{
+    let pool=S.staff.filter(s=>!s.manual&&s.role===role&&h[s.id]+paid<=s.max+1e-6&&!getSlot(d,sh.id).includes(s.id)&&!s.off.includes(d));
+    if(!pool.length)return null;
+    let fresh=pool.filter(s=>!assignedToday(d,s.id));
+    if(!fresh.length)return null;
+    let des=shiftDesir(sh,d),B={};
+    fresh.forEach(s=>{B[s.id]=fairBal(s.id)});
+    fresh.sort((a,b)=>((a.emp===sh.emp?0:1)-(b.emp===sh.emp?0:1))||(des<0?(B[b.id]-B[a.id]):(B[a.id]-B[b.id]))||(h[a.id]-h[b.id])||(Math.random()-.5));
+    for(let s of fresh){getSlot(d,sh.id).push(s.id);let bad=fatigueIssuesFor(s.id).length>0;getSlot(d,sh.id).pop();if(!bad)return s}
+    return null;
+  };
+  {
+    let perDay=[...Array(7).keys()].map(()=>[]);
+    for(let d=0;d<7;d++)for(let sh of S.shifts){
+      if(!shiftRange(sh,d))continue;
+      let wants={};
+      S.roles.forEach(role=>{let want=Math.max(0,(sh.need[role]||0)-manualCover(d,sh,role).length);wants[role]=want});
+      if(S.opt.mgrCovers&&managerOnDuty(d,sh).length){
+        let order=[...S.roles].sort((a,b)=>(wants[b]-wants[a])||((b==="Budtender")-(a==="Budtender")));
+        if(wants[order[0]]>0)wants[order[0]]--;
+      }
+      S.roles.forEach(role=>{for(let i=0;i<wants[role];i++)perDay[d].push({sh,role})});
+    }
+    let daySeq=[...Array(7).keys()];
+    for(let k=daySeq.length-1;k>0;k--){let j=Math.floor(Math.random()*(k+1));[daySeq[k],daySeq[j]]=[daySeq[j],daySeq[k]]}
+    let more=true;
+    while(more){
+      more=false;
+      for(let d of daySeq)if(perDay[d].length){let u=perDay[d].shift();more=true;
+        let paid=u.sh.emp==="FT"?FT_PAID:PT_PAID;
+        let s=pick(d,u.sh,u.role,paid);
+        if(s){getSlot(d,u.sh.id).push(s.id);h[s.id]+=paid}
+      }
+      for(let k=daySeq.length-1;k>0;k--){let j=Math.floor(Math.random()*(k+1));[daySeq[k],daySeq[j]]=[daySeq[j],daySeq[k]]}
+    }
+  }
+  if(S.opt&&S.opt.floatPT){
+    let n=Math.max(0,S.opt.floatN||0);
+    if(n>0)for(let d=0;d<7;d++)for(let sh of S.shifts){
+      if(!shiftRange(sh,d))continue;
+      let paid=sh.emp==="FT"?FT_PAID:PT_PAID;
+      for(let i=0;i<n;i++){
+        let pool=S.staff.filter(s=>!s.manual&&s.emp==="PT"&&h[s.id]+paid<=s.max+1e-6&&!getSlot(d,sh.id).includes(s.id)&&!s.off.includes(d));
+        if(!pool.length)break;
+        let fresh=pool.filter(s=>!assignedToday(d,s.id));
+        if(!fresh.length)break;
+        let s=fresh[Math.floor(Math.random()*fresh.length)];
+        getSlot(d,sh.id).push(s.id);
+        if(fatigueIssuesFor(s.id).length>0){getSlot(d,sh.id).pop();continue}
+        h[s.id]+=paid;
+      }
+    }
+  }
+  snapshotFairness();
+  save();renderGrid();renderIssues();
+}
+async function ensurePDFLibs(){
+  if(window.jspdf && window.jspdf.jsPDF && (window.jspdf.API && window.jspdf.API.autoTable || window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable))return;
+  async function load(src){
+    if([...document.scripts].some(s=>s.src===src))return;
+    await new Promise((res,rej)=>{let s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+  }
+  if(!window.jspdf||!window.jspdf.jsPDF)await load("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+  await load("https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js");
+}
+const KINDC={AM:{bg:"#dbeafe",fg:"#1e40af",label:"Open"},MID:{bg:"#dcfce7",fg:"#166534",label:"Mid"},PM:{bg:"#ffedd5",fg:"#9a3412",label:"Close"}};
+function kindColor(k){return KINDC[k]||{bg:"#f3f4f6",fg:"#111827",label:k}}
+const KINDGRAD={AM:"linear-gradient(180deg,#2f6df6,#1e40af)",MID:"linear-gradient(180deg,#12a37c,#065f46)",PM:"linear-gradient(180deg,#e5484d,#991b1b)"};
+const KINDNAME={AM:"Morning Shift",MID:"Evening Shift",PM:"Night Shift"};
+function hexRGB(h){h=h.replace("#","");return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+async function exportPDF(){
+  await ensurePDFLibs();
+  let wd=weekDays();
+  let {jsPDF}=window.jspdf;
+  let doc=new jsPDF({orientation:"landscape",unit:"pt"});
+  let title="Plan-It Scheduling "+iso(wd[0])+" – "+iso(wd[6]);
+  doc.setFontSize(16);doc.text(title,40,40);
+  doc.setTextColor(0);
+  let sorted=[...S.staff].sort((a,b)=>(S.roles.indexOf(a.role)-S.roles.indexOf(b.role))||a.name.localeCompare(b.name));
+  let fills=sorted.map(st=>[...Array(7)].map((_,d)=>{
+    if(st.off.includes(d))return {t:"OFF",bg:[243,244,246],fg:[107,114,128]};
+    if(st.manual){let m=S.manual[d+"__"+st.id];if(!m)return {t:"—",bg:null};return {t:fmt(m.s)+"–"+fmt(m.e),bg:hexRGB(roleColor(st.role)),fg:[255,255,255]}}
+    let slots=[];
+    S.shifts.forEach(sh=>{if(getSlot(d,sh.id).includes(st.id))slots.push({sh,r:shiftRange(sh,d)})});
+    slots.sort((a,b)=>(a.r?a.r.s:0)-(b.r?b.r.s:0));
+    if(!slots.length)return {t:"—",bg:null};
+    let c=kindColor(slots[0].sh.kind);
+    return {t:slots.map(s=>s.r?s.r.label:"").join("\n"),bg:hexRGB(c.bg),fg:hexRGB(c.fg)};
+  }));
+  let head=["Name",...wd.map((d,i)=>DAYS[i]+" "+(d.getMonth()+1)+"/"+d.getDate())];
+  let body=sorted.map((st,r)=>[st.name+" ("+st.role+")",...fills[r].map(f=>f.t)]);
+  doc.autoTable({startY:56,head:[head],body,styles:{fontSize:8,cellPadding:4},headStyles:{fillColor:[17,24,39]},
+    didParseCell(d){
+      if(d.section!=="body"||d.column.index===0)return;
+      let f=fills[d.row.index][d.column.index-1];
+      if(f.bg){d.cell.styles.fillColor=f.bg;d.cell.styles.textColor=f.fg}
+      else d.cell.styles.textColor=[156,163,175];
+    }});
+  let y=doc.lastAutoTable.finalY+22;
+  doc.setFontSize(11);doc.setTextColor(0);doc.text("Legend",40,y);y+=14;
+  let x=40;
+  Object.values(KINDC).forEach(c=>{
+    let label=c.label;
+    doc.setFontSize(9);
+    let w=doc.getTextWidth(label)+28;
+    if(x+w>doc.internal.pageSize.getWidth()-40){x=40;y+=18}
+    let b=hexRGB(c.bg),f=hexRGB(c.fg);
+    doc.setFillColor(b[0],b[1],b[2]);doc.rect(x,y-10,12,12,"F");
+    doc.setDrawColor(f[0],f[1],f[2]);doc.rect(x,y-10,12,12);
+    doc.setTextColor(0);doc.text(label,x+16,y);
+    x+=w;
+  });
+  let evs=[...(S.events||[])].sort((a,b)=>a.day-b.day);
+  if(evs.length){
+    let ey=y+24;
+    doc.setFontSize(11);doc.setTextColor(0);doc.text("Events",40,ey);
+    doc.autoTable({startY:ey+6,head:[["Day","Event"]],body:evs.map(e=>[DAYS[e.day],e.text]),styles:{fontSize:9,cellPadding:5},headStyles:{fillColor:[17,24,39]}});
+  }
+  doc.save("schedule-"+S.weekStart+".pdf");
+}
+weekInput.onchange=e=>{if(!e.target.value)return;S.weekStart=iso(monday(parseISO(e.target.value)));weekInput.value=S.weekStart;S.assign={};save();renderAll()};
+floatChk.onchange=e=>{S.opt.floatPT=e.target.checked;save()};
+floatN.onchange=e=>{S.opt.floatN=Math.max(0,parseInt(e.target.value||"0"));save()};
+mgrCovChk.onchange=e=>{S.opt.mgrCovers=e.target.checked;save();renderGrid();renderIssues()};
+mgrSel.onchange=renderManagers;
+document.addEventListener("keydown",e=>{if(e.ctrlKey&&e.shiftKey&&(e.key==="N"||e.key==="n")){e.preventDefault();eventTextInput.focus()}});
+function renderManagers(){
+  let mgrs=S.staff.filter(s=>s.role==="Manager");
+  mgrSel.innerHTML=mgrs.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+  if(!mgrs.length){mgrDays.innerHTML="";mgrTot.textContent="No managers — add staff with the Manager role.";return}
+  if(!mgrs.some(s=>s.id===mgrSel.value))mgrSel.value=mgrs[0].id;
+  let st=staffById(mgrSel.value)||mgrs[0];
+  let tot=0;mgrDays.innerHTML="";
+  for(let d=0;d<7;d++){
+    let m=S.manual[d+"__"+st.id];
+    let row=document.createElement("div");row.className="row";row.style.margin="4px 0";
+    row.innerHTML=`<b style="width:44px">${DAYS[d]}</b><input type="time" data-s value="${m?tstr(m.s):""}"><span class="muted">–</span><input type="time" data-e value="${m?tstr(m.e):""}">${m?`<button class="ghost small" data-c>Clear</button>`:`<span class="muted">off</span>`}${st.off.includes(d)?` <span class="muted">day off</span>`:""}`;
+    row.querySelector("[data-s]").onchange=e=>saveMgrDay(st.id,d,e.target.value,row.querySelector("[data-e]").value);
+    row.querySelector("[data-e]").onchange=e=>saveMgrDay(st.id,d,row.querySelector("[data-s]").value,e.target.value);
+    let cb=row.querySelector("[data-c]");if(cb)cb.onclick=()=>{delete S.manual[d+"__"+st.id];save();renderAll()};
+    mgrDays.appendChild(row);
+    if(m){let len=m.e-m.s;tot+=len/60-(len>=480?0.5:0)}
+  }
+  mgrTot.textContent=`${st.name}: ${Math.round(tot*2)/2}/${st.max} hrs this week`;
+}
+function saveMgrDay(id,d,sv,ev){
+  if(!sv||!ev)return;
+  let p=sv.split(":"),q=ev.split(":");
+  S.manual[d+"__"+id]={s:(+p[0])*60+(+p[1]),e:(+q[0])*60+(+q[1])};
+  save();renderAll();
+}
+const NEWS_FEEDS=[
+{name:"High Times · Ohio",url:"https://news.google.com/rss/search?q=site:hightimes.com%20Ohio%20cannabis&hl=en-US&gl=US&ceid=US:en"},
+{name:"Ohio Capital Journal",url:"https://ohiocapitaljournal.com/?s=marijuana&feed=rss2"},
+{name:"Cleveland Scene",url:"https://www.clevescene.com/feed/",kw:"cannabis|marijuana|weed|dispensary|hemp|pot|\\bcbd\\b",requireKw:true},
+{name:"Columbus Dispatch",url:"https://news.google.com/rss/search?q=site:dispatch.com%20marijuana&hl=en-US&gl=US&ceid=US:en"},
+{name:"Cincinnati Enquirer",url:"https://news.google.com/rss/search?q=site:cincinnati.com%20cannabis&hl=en-US&gl=US&ceid=US:en"},
+{name:"High Times",url:"https://news.google.com/rss/search?q=site:hightimes.com&hl=en-US&gl=US&ceid=US:en"},
+{name:"NORML · Ohio",url:"https://norml.org/feed/",kw:"ohio",requireKw:false}];
+const NEWS_KEY="planit-news-v2";
+let newsArts=[],newsIdx=0,newsTimer=null;
+function escH(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function cleanDesc(t,d){d=String(d||"");if(!t||!d)return d;let tl=t.toLowerCase().replace(/\s+/g," ").trim(),dl=d.toLowerCase().replace(/\s+/g," ").trim();if(dl.startsWith(tl))d=d.slice(t.length).replace(/^[.\-–—:|·\s]+/,"");else{let m=d.match(/^(.{10,}?)\s+[-–—]\s+(.*)$/);if(m&&tl.indexOf(m[1].toLowerCase().replace(/\s+/g," ").trim())===0)d=m[2]}if(d.length>160)d=d.slice(0,157)+"…";return d}
+function stripTags(h){let d=document.createElement("div");d.innerHTML=h||"";return (d.textContent||"").replace(/\s+/g," ").trim()}
+function loadNewsCache(){try{let c=JSON.parse(localStorage.getItem(NEWS_KEY)||"null");if(c&&c.arts&&c.arts.length)return c}catch(e){}return null}
+function renderNews(){
+let box=document.querySelector("#newsBox");if(!box)return;
+let tx=box.querySelector("#newsText"),ct=box.querySelector("#newsCount");
+if(!newsArts.length){tx.innerHTML='<span class="muted">No headlines right now — check back later.</span>';ct.textContent="";return}
+let a=newsArts[((newsIdx%newsArts.length)+newsArts.length)%newsArts.length];
+tx.innerHTML='<a class="newslink" href="'+escH(a.l)+'" target="_blank" rel="noopener">'+escH(a.t)+'</a>'+(a.d?'<div class="newsdesc">'+escH(a.d)+'</div>':"")+'<div class="newssrc muted">'+escH(a.src)+'</div>';
+ct.textContent=((((newsIdx%newsArts.length)+newsArts.length)%newsArts.length)+1)+" / "+newsArts.length;
+}
+function startNewsTimer(){if(newsTimer)clearInterval(newsTimer);newsTimer=setInterval(()=>{if(!newsArts.length)return;newsIdx=(newsIdx+1)%newsArts.length;renderNews()},60000)}
+function newsMove(d){if(!newsArts.length)return;newsIdx=((newsIdx+d)%newsArts.length+newsArts.length)%newsArts.length;renderNews();startNewsTimer()}
+async function refreshNews(){
+let c=loadNewsCache();
+if(c&&c.day===new Date().toDateString()){newsArts=c.arts.map(a=>({t:a.t,l:a.l,src:a.src,p:a.p||0,d:cleanDesc(a.t,a.d||"")}));newsIdx=0;renderNews();startNewsTimer();return}
+let arts=[];
+for(let f of NEWS_FEEDS){
+try{
+let txt=await root.superFetch(f.url).then(r=>r.text());
+let xml=new DOMParser().parseFromString(txt,"text/xml");
+let items=xml.querySelectorAll("item");
+if(!items.length)items=xml.querySelectorAll("entry");
+let got=[];
+let cutoff=Date.now()-30*24*3600*1000;
+for(let i=0;i<items.length&&i<40;i++){
+let it=items[i];
+let g=n=>{let e=it.querySelector(n);return e?e.textContent||"":""};
+let t=(g("title")||"").trim();
+let l=(g("link")||"").trim();
+if(!l){let le=it.querySelector("link");if(le&&le.getAttribute)l=(le.getAttribute("href")||"").trim()}
+let pd=Date.parse((g("pubDate")||g("published")||g("updated")||"").trim());
+if(pd&&pd<cutoff)continue;
+let d=cleanDesc(t,stripTags(g("description")||g("summary")||g("content")||""));
+if(t&&l)got.push({t:t,l:l,d:d,src:f.name,p:pd||0});
+}
+if(f.kw){let rx=new RegExp(f.kw,"i");let m=got.filter(o=>rx.test(o.t+" "+o.d));got=m.length?m:(f.requireKw?[]:got)}
+got.slice(0,4).forEach(o=>arts.push(o));
+}catch(e){}
+}
+if(arts.length){
+for(let i=arts.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));let tmp=arts[i];arts[i]=arts[j];arts[j]=tmp}
+newsArts=arts.slice(0,30);
+try{localStorage.setItem(NEWS_KEY,JSON.stringify({day:new Date().toDateString(),arts:newsArts}))}catch(e){}
+}else if(c){newsArts=c.arts}
+newsIdx=0;renderNews();startNewsTimer();
+}
+load().then(()=>{renderAll();goModule(2,false);refreshNews()});
+</script>
 
